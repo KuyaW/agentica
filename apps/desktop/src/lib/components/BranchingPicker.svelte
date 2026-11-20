@@ -126,6 +126,11 @@
     return Math.min(Math.max(order, 0), FOLD_STAGGER_MAX) * FOLD_STAGGER;
   }
 
+  /** A thread takes its card's beat, and holds still under reduced motion. */
+  function threadWait(wait: number): number {
+    return matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : wait;
+  }
+
   /**
    * An unfolding card grows out of the card it hangs from, and a folding one
    * shrinks back into it. `from` is that card's offset, so the same tween runs
@@ -767,8 +772,14 @@
               <path
                 class="map__edge"
                 d={link.d}
-                in:fade={{ duration: 200 }}
-                out:fade={{ duration: 120 }}
+                in:fade={{
+                  duration: 200,
+                  delay: threadWait(unfoldWait(cards, link.id)),
+                }}
+                out:fade={{
+                  duration: 120,
+                  delay: threadWait(foldWait(lastFrame.cards, link.id)),
+                }}
               />
             {/each}
           </svg>
