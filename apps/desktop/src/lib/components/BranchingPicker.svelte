@@ -384,10 +384,12 @@
     const started = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / duration);
-      // Ease out, so the branch settles rather than stopping dead.
+      // The pan settles first and the scale eases in behind it, so a reframing
+      // reads as a move across the map rather than a lurch in zoom.
       const eased = 1 - (1 - t) ** 3;
+      const zoomed = t * t * (3 - 2 * t);
       transform = {
-        k: from.k + (next.k - from.k) * eased,
+        k: from.k + (next.k - from.k) * zoomed,
         x: from.x + (next.x - from.x) * eased,
         y: from.y + (next.y - from.y) * eased,
       };
@@ -417,10 +419,15 @@
   // where it stands.
   let shownBranch: string | null = null;
   let framed = false;
+  // The cards the last framing saw, so a collapse can wait for the ones
+  // folding out before it moves the view.
+  let framedCards: readonly { node: LaidOutNode }[] = [];
 
   $effect(() => {
     void layoutKey;
     if (!mapWidth || !mapHeight) return;
+    const previous = framedCards;
+    framedCards = cards;
     const viewport = { width: mapWidth, height: mapHeight };
     const openId = open?.id ?? null;
     const changed = openId !== shownBranch;
@@ -440,7 +447,18 @@
 
     const bounds = openId ? branchBounds(openId) : null;
     if (!bounds || !openId) {
-      glideTo(fitTransform(layoutBounds(layout), viewport));
+      // A closing branch folds its canvases back first, so hold the view until
+      // the last one has landed instead of sliding the cards out from under it.
+      const leaving = previous.filter(
+        (item) => !cards.some((next) => next.node.id === item.node.id),
+      );
+      const foldBack = leaving.length
+        ? Math.max(
+            0,
+            ...leaving.map((item) => foldWait(previous, item.node.id)),
+          ) + FOLD_OUT
+        : 0;
+      glideTo(fitTransform(layoutBounds(layout), viewport), 340, foldBack);
       return;
     }
 
