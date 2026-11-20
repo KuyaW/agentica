@@ -6,6 +6,14 @@
   import Icon from "./Icon.svelte";
   import Logomark from "./Logomark.svelte";
   import {
+    DEFAULT_WORKSPACE_ICON,
+    readWorkspaceIcons,
+    saveWorkspaceIcons,
+    WORKSPACE_ICON_LABELS,
+    WORKSPACE_ICONS,
+    type WorkspaceIcon,
+  } from "../workspace-icons";
+  import {
     NODE_H,
     NODE_W,
     edgePath,
@@ -235,6 +243,64 @@
   async function backup(id: string, label: string) {
     backedUp = "";
     if (await onBackup(id)) backedUp = `Backed up “${label}”.`;
+  }
+
+  /* ------------------------------------------------- workspace icons */
+
+  // Badge choices are a device preference, like the theme and the layout.
+  let icons = $state<Record<string, WorkspaceIcon>>(readWorkspaceIcons());
+  let iconEditor = $state<string | null>(null);
+  const iconTriggers = new Map<string, HTMLButtonElement>();
+  const iconChoices = new Map<string, HTMLButtonElement>();
+
+  const iconFor = (id: string) => icons[id] ?? DEFAULT_WORKSPACE_ICON;
+
+  function trackIconTrigger(node: HTMLButtonElement, id: string) {
+    iconTriggers.set(id, node);
+    return { destroy: () => iconTriggers.delete(id) };
+  }
+
+  function trackIconChoice(node: HTMLButtonElement, key: string) {
+    iconChoices.set(key, node);
+    return { destroy: () => iconChoices.delete(key) };
+  }
+
+  /** Open the palette under a card and land on its current badge. */
+  async function openIconEditor(id: string) {
+    iconEditor = id;
+    await tick();
+    iconChoices.get(`${id}:${iconFor(id)}`)?.focus();
+  }
+
+  /** Fold the palette away and hand focus back to the badge that opened it. */
+  async function closeIconEditor(id: string) {
+    if (iconEditor !== id) return;
+    iconEditor = null;
+    await tick();
+    iconTriggers.get(id)?.focus();
+  }
+
+  function chooseIcon(id: string, icon: WorkspaceIcon) {
+    icons = { ...icons, [id]: icon };
+    saveWorkspaceIcons(icons);
+    void closeIconEditor(id);
+  }
+
+  function onIconKeydown(event: KeyboardEvent, id: string) {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    event.stopPropagation();
+    void closeIconEditor(id);
+  }
+
+  /** Focus leaving the palette folds it away, unless it reaches its badge. */
+  function leaveIconEditor(event: FocusEvent, id: string) {
+    const next = event.relatedTarget;
+    if (next === iconTriggers.get(id)) return;
+    const palette = (event.currentTarget as Element).closest(".card__icons");
+    if (next instanceof Node && palette?.contains(next)) return;
+    if (!document.hasFocus()) return;
+    if (iconEditor === id) iconEditor = null;
   }
 
   /* -------------------------------------------------- the branching map */
@@ -898,7 +964,25 @@
               {:else if card.info.kind === "workspace"}
                 {@const expanded = open?.id === workspaceId}
                 {@const confirmingCard = isConfirming("workspace", workspaceId)}
+                {@const editingIcon = iconEditor === workspaceId}
+                {@const paletteId = `workspace-icons-${workspaceId}`}
                 <div class="card" class:card--open={expanded}>
+                  <button
+                    class="card__badge card__badge--workspace"
+                    type="button"
+                    title="Change workspace icon"
+                    aria-label={`Change icon for ${card.info.label}`}
+                    aria-expanded={editingIcon}
+                    aria-controls={paletteId}
+                    disabled={locked || confirmingCard}
+                    use:trackIconTrigger={workspaceId}
+                    onclick={() =>
+                      editingIcon
+                        ? void closeIconEditor(workspaceId)
+                        : void openIconEditor(workspaceId)}
+                  >
+                    <Icon name={iconFor(workspaceId)} size={17} />
+                  </button>
                   <button
                     class="card__open"
                     type="button"
@@ -910,16 +994,16 @@
                     onclick={() =>
                       expanded ? onCollapse() : onOpenWorkspace(workspaceId)}
                   >
-                    <span class="card__chevron"
-                      ><Icon
-                        name={expanded ? "expand_more" : "chevron_right"}
-                        size={18}
-                      /></span
-                    >
                     <span class="card__copy">
                       <span class="card__name">{card.info.label}</span>
                       <span class="card__meta">{card.info.meta}</span>
                     </span>
+                    <span class="card__chevron"
+                      ><Icon
+                        name={expanded ? "expand_more" : "chevron_right"}
+                        size={16}
+                      /></span
+                    >
                   </button>
                   <span class="card__tools">
                     <button
@@ -945,6 +1029,32 @@
                     </button>
                   </span>
                 </div>
+
+                {#if editingIcon}
+                  <div
+                    class="card__icons"
+                    id={paletteId}
+                    role="toolbar"
+                    aria-label={`Icon for ${card.info.label}`}
+                  >
+                    {#each WORKSPACE_ICONS as icon (icon)}
+                      <button
+                        class="card__icon-choice"
+                        type="button"
+                        aria-pressed={iconFor(workspaceId) === icon}
+                        aria-label={WORKSPACE_ICON_LABELS[icon]}
+                        title={WORKSPACE_ICON_LABELS[icon]}
+                        use:trackIconChoice={`${workspaceId}:${icon}`}
+                        onkeydown={(event) => onIconKeydown(event, workspaceId)}
+                        onfocusout={(event) =>
+                          leaveIconEditor(event, workspaceId)}
+                        onclick={() => chooseIcon(workspaceId, icon)}
+                      >
+                        <Icon name={icon} size={16} />
+                      </button>
+                    {/each}
+                  </div>
+                {/if}
 
                 {#if confirmingCard}
                   {@const confirmTitleId = `delete-workspace-${workspaceId}-title`}
@@ -1553,6 +1663,40 @@
     background: var(--surface-soft);
   }
 
+  /* The workspace badge is also the button that opens the icon palette. */
+  .card__badge--workspace {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font: inherit;
+    border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+    border-radius: 11px;
+    cursor: pointer;
+    transition:
+      transform 0.22s var(--spring),
+      box-shadow 0.18s ease,
+      background 0.16s ease,
+      color 0.16s ease;
+  }
+
+  .card__badge--workspace:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card__badge--workspace:active:not(:disabled) {
+    transform: translateY(0) scale(0.94);
+  }
+
+  .card__badge--workspace[aria-expanded="true"] {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .card__badge--workspace:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
   .card__open {
     display: flex;
     align-items: center;
@@ -1650,6 +1794,63 @@
   .card__tool:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+  }
+
+  /* The icon palette hangs below the card, like the delete confirmation, so
+     all eight choices stay outside the 64px card. */
+  .card__icons {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 3;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    width: 216px;
+    padding: 8px;
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .map__node:has(.card__icons) {
+    z-index: 4;
+  }
+
+  .card__icon-choice {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 0;
+    color: var(--ink-soft);
+    background: var(--surface-soft);
+    border: 1px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    transition:
+      transform 0.22s var(--spring),
+      color 0.16s ease,
+      background 0.16s ease,
+      border-color 0.16s ease;
+  }
+
+  .card__icon-choice:hover {
+    transform: translateY(-1px);
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+  }
+
+  .card__icon-choice[aria-pressed="true"] {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  .card__icon-choice:focus-visible {
+    outline-offset: 2px;
   }
 
   /* The confirmation overlays its own card, then grows over the gap below it

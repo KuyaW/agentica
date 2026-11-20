@@ -3364,7 +3364,8 @@
             disabled={working}
             onclick={() => void backToWorkspaces()}
           >
-            <span class="crumb__icon"><Icon name="workspaces" size={16} /></span
+            <span class="crumb__icon"
+              ><Icon name="folder_open" size={16} /></span
             ><span class="crumb__back"
               ><Icon name="arrow_back" size={16} /></span
             ><span class="crumb__label">{workspaceName}</span>
