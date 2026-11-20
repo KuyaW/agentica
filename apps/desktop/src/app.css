@@ -1297,13 +1297,6 @@ button.home__brand:disabled {
   padding: 0 0.5rem 0.5rem;
 }
 
-.home__backup {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-}
-
 /* Covers the whole tile while asking to confirm a destructive delete. */
 .tile__confirm {
   position: absolute;

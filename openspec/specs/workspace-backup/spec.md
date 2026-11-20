@@ -10,7 +10,7 @@ move does not lose their work.
 
 ### Requirement: Back up a workspace to a chosen file
 
-The desktop app SHALL let the user back up any listed workspace from the workspace picker to a file chosen with a native save dialog. The backup SHALL be a consistent, complete copy of the workspace's stored data, including canvases, conversations, attached files, reviews, project groups, session tile presets, and MCP server settings. Backing up SHALL NOT modify the workspace, and SHALL succeed while the workspace is open in this or another Agentica window. A failed or cancelled backup SHALL NOT leave a partial file at the chosen path. The action SHALL tell the user that the backup may contain credentials stored in MCP server settings.
+The desktop app SHALL let the user back up any listed workspace from the workspace picker or from Settings to a file chosen with a native save dialog. The backup SHALL be a consistent, complete copy of the workspace's stored data, including canvases, conversations, attached files, reviews, project groups, session tile presets, and MCP server settings. Backing up SHALL NOT modify the workspace, and SHALL succeed while the workspace is open in this or another Agentica window. A failed or cancelled backup SHALL NOT leave a partial file at the chosen path. The action SHALL tell the user that the backup may contain credentials stored in MCP server settings.
 
 #### Scenario: Back up a workspace
 
@@ -36,7 +36,7 @@ The desktop app SHALL let the user back up any listed workspace from the workspa
 
 ### Requirement: Restore a backup as a new workspace
 
-The desktop app SHALL let the user restore a backup file, chosen with a native open dialog, from the workspace picker. A valid backup SHALL become a new workspace with a new identity, named after the original with ` (restored)` appended, and SHALL appear in the workspace list. Restoring SHALL NOT modify, overwrite, or merge into any existing workspace, including the one the backup was made from. A backup from an older storage version SHALL be upgraded the same way opening an older workspace upgrades it. A failed or cancelled restore SHALL leave no new workspace behind.
+The desktop app SHALL let the user restore a backup file, chosen with a native open dialog, from Settings. A valid backup SHALL become a new workspace with a new identity, named after the original with ` (restored)` appended, and SHALL appear in the workspace list. Restoring SHALL NOT modify, overwrite, or merge into any existing workspace, including the one the backup was made from. A backup from an older storage version SHALL be upgraded the same way opening an older workspace upgrades it. A failed or cancelled restore SHALL leave no new workspace behind.
 
 #### Scenario: Restore a backup
 
@@ -105,10 +105,16 @@ Restoring a backup SHALL NOT start any process. Every MCP server in the restored
 
 ### Requirement: Backup and restore require the desktop app
 
-Backup and restore SHALL be available only in the desktop app. In browser mode, the workspace picker SHALL show both actions as disabled with an explanation that they need the desktop app.
+Backup and restore SHALL be available only in the desktop app. In browser mode, the workspace picker SHALL show Back up as disabled and Settings SHALL show Back up and Restore from backup as disabled, each with an explanation that it needs the desktop app.
 
 #### Scenario: Browser mode
 
 - **WHEN** the user views the workspace picker in browser mode
+- **THEN** Back up is disabled
+- **AND** an accessible explanation says it needs the desktop app
+
+#### Scenario: Backup and restore in Settings in browser mode
+
+- **WHEN** the user opens Settings in browser mode
 - **THEN** Back up and Restore from backup are disabled
 - **AND** an accessible explanation says they need the desktop app

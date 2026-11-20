@@ -25,7 +25,6 @@
     /** Desktop only: native dialogs choose the backup file. */
     backups: boolean;
     onBackup: (id: string) => Promise<boolean>;
-    onRestore: () => void;
     onOpenSettings: () => void;
   }
 
@@ -43,7 +42,6 @@
     onDelete,
     backups,
     onBackup,
-    onRestore,
     onOpenSettings,
   }: Props = $props();
 
@@ -199,30 +197,15 @@
         A workspace keeps your boards, notes and AI conversations together. It’s
         saved on this computer.
       </p>
-      <div class="home__backup">
-        <button
-          class="btn btn--ghost"
-          type="button"
-          disabled={locked || !backups}
-          aria-describedby="backup-hint"
-          onclick={() => {
-            backedUp = "";
-            onRestore();
-          }}
-        >
-          <Icon name="settings_backup_restore" size={18} />
-          Restore from backup
-        </button>
-        <p class="home__hint" id="backup-hint">
-          {#if backups}
-            A backup is a full copy of a workspace, including MCP server
-            settings that may hold credentials. Keep backup files private.
-            Restoring adds a new workspace and never starts its tools.
-          {:else}
-            Backing up and restoring workspaces needs the desktop app.
-          {/if}
-        </p>
-      </div>
+      <p class="home__hint" id="backup-hint">
+        {#if backups}
+          A backup is a full copy of a workspace, including MCP server settings
+          that may hold credentials. Keep backup files private. Back up or
+          restore any workspace in Settings.
+        {:else}
+          Backing up workspaces needs the desktop app.
+        {/if}
+      </p>
     </section>
 
     <section class="home__recent">

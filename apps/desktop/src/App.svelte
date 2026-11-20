@@ -3296,10 +3296,6 @@
               "workspace",
           }),
         )}
-      onRestore={() =>
-        void editor.restoreWorkspace(() =>
-          invoke<string | null>("restore_workspace"),
-        )}
       onOpenSettings={() => (settingsOpen = true)}
     />
   {:else if stage === "canvas"}
@@ -4226,6 +4222,18 @@
       onChange={(next) => (theme = next)}
       onAccentChange={(next) => (accent = next)}
       {layout}
+      workspaces={editorState.workspaces}
+      onBackup={(id, name) =>
+        editor.backupWorkspace(() =>
+          invoke<boolean>("backup_workspace", {
+            workspaceId: id,
+            suggestedName: name,
+          }),
+        )}
+      onRestore={() =>
+        void editor.restoreWorkspace(() =>
+          invoke<string | null>("restore_workspace"),
+        )}
       onLayoutChange={(next) => {
         layout = next;
         return saveLayout(next);

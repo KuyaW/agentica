@@ -1,5 +1,10 @@
 <script module lang="ts">
-  export type SettingsSection = "ai" | "tools" | "appearance" | "advanced";
+  export type SettingsSection =
+    | "ai"
+    | "tools"
+    | "appearance"
+    | "advanced"
+    | "workspaces";
 </script>
 
 <script lang="ts">
@@ -49,6 +54,12 @@
     layout: Layout;
     /** Applies the layout now; false when it couldn't be saved for next launch. */
     onLayoutChange: (layout: Layout) => boolean;
+    /** Backed-up workspaces, as the workspace picker lists them. */
+    workspaces: { id: string; name: string | null }[];
+    /** Desktop only: writes a backup file; true once it is saved. */
+    onBackup: (id: string, name: string) => Promise<boolean>;
+    /** Desktop only: restores a backup file as a new workspace. */
+    onRestore: () => void;
     onClose: () => void;
   }
 
@@ -60,6 +71,9 @@
     onAccentChange,
     layout,
     onLayoutChange,
+    workspaces,
+    onBackup,
+    onRestore,
     onClose,
     connectionKey,
     connected,
@@ -72,6 +86,7 @@
     { id: "tools", label: "Tools", icon: "extension" },
     { id: "appearance", label: "Appearance", icon: "palette" },
     { id: "advanced", label: "Advanced", icon: "tune" },
+    { id: "workspaces", label: "Workspaces", icon: "workspaces" },
   ];
   // svelte-ignore state_referenced_locally
   let selected = $state<SettingsSection>(section ?? "ai");
@@ -80,6 +95,34 @@
 
   let checkAbort: AbortController | undefined;
   onMount(() => () => checkAbort?.abort());
+
+  // A backup needs a readable name; unreadable workspaces are left out.
+  const backupChoices = $derived(
+    workspaces.flatMap((entry) =>
+      entry.name ? [{ id: entry.id, name: entry.name }] : [],
+    ),
+  );
+  // Start on the open workspace, or the first backup the user can make.
+  // svelte-ignore state_referenced_locally
+  let backupId = $state(workspaceId ?? "");
+  const backupTarget = $derived(
+    backupChoices.find((entry) => entry.id === backupId) ?? backupChoices[0],
+  );
+  let backingUp = $state(false);
+  let backupNote = $state("");
+
+  async function backUp() {
+    const target = backupTarget;
+    if (!target) return;
+    backupNote = "";
+    backingUp = true;
+    try {
+      if (await onBackup(target.id, target.name))
+        backupNote = `Backed up “${target.name}”. Keep the file private.`;
+    } finally {
+      backingUp = false;
+    }
+  }
 
   const dark = $derived(theme === "dark");
   let layoutNote = $state("");
@@ -715,6 +758,105 @@
 
         <CodingAgents {connectionKey} {connected} {sessions} />
       </section>
+
+      <section
+        class="settings__section"
+        aria-labelledby="settings-workspaces-title"
+        hidden={selected !== "workspaces"}
+      >
+        <div class="settings__heading">
+          <h2 id="settings-workspaces-title" class="settings__title">
+            Workspaces
+          </h2>
+          <p class="settings__intro">
+            Workspaces are saved on this computer. Keep a complete copy outside
+            the app, or bring a copy back as a new workspace.
+          </p>
+        </div>
+
+        <section class="setting setting--stacked">
+          <span class="setting__icon"><Icon name="save_alt" size={20} /></span>
+          <div class="setting__text">
+            <h3 id="backup-workspace-label">Back up a workspace</h3>
+            <p>
+              Saves a complete copy of the workspace to a file you choose, so
+              you can restore it here or on another computer.
+            </p>
+            <div class="setting__body">
+              {#if backupChoices.length}
+                <div class="setting__input-row">
+                  <select
+                    id="backup-workspace"
+                    aria-labelledby="backup-workspace-label"
+                    value={backupTarget?.id ?? ""}
+                    disabled={!desktopMode || !connected || backingUp}
+                    onchange={(event) => {
+                      backupId = event.currentTarget.value;
+                      backupNote = "";
+                    }}
+                  >
+                    {#each backupChoices as entry (entry.id)}
+                      <option value={entry.id}>{entry.name}</option>
+                    {/each}
+                  </select>
+                  <button
+                    class="btn btn--soft"
+                    type="button"
+                    aria-describedby="backup-workspace-hint"
+                    disabled={!desktopMode || !connected || backingUp}
+                    onclick={() => void backUp()}
+                  >
+                    {#if backingUp}<span class="spinner"></span>{/if}
+                    Back up
+                  </button>
+                </div>
+              {:else}
+                <p class="setting__hint">No workspaces to back up yet.</p>
+              {/if}
+              <p class="setting__hint" id="backup-workspace-hint">
+                {#if desktopMode}A backup is a full copy of a workspace,
+                  including MCP server settings that may hold credentials. Keep
+                  backup files private.
+                {:else}Backing up workspaces needs the desktop app.{/if}
+              </p>
+              {#if backupNote}
+                <p class="setting__hint" role="status">{backupNote}</p>
+              {/if}
+            </div>
+          </div>
+        </section>
+
+        <section class="setting setting--stacked">
+          <span class="setting__icon"
+            ><Icon name="settings_backup_restore" size={20} /></span
+          >
+          <div class="setting__text">
+            <h3 id="restore-backup-label">Restore from backup</h3>
+            <p>
+              Adds the backup as a new workspace. Existing workspaces are never
+              overwritten, and the restored one starts with its tools off.
+            </p>
+            <div class="setting__body">
+              <button
+                class="btn btn--soft settings__link"
+                type="button"
+                aria-describedby="restore-backup-hint"
+                disabled={!desktopMode || !connected}
+                onclick={onRestore}
+              >
+                <Icon name="settings_backup_restore" size={18} />Restore from
+                backup
+              </button>
+              <p class="setting__hint" id="restore-backup-hint">
+                {#if desktopMode}A backup is a full copy of a workspace,
+                  including MCP server settings that may hold credentials. Keep
+                  backup files private.
+                {:else}Restoring workspaces needs the desktop app.{/if}
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
     </div>
   </div>
 </Modal>
@@ -878,6 +1020,11 @@
     display: flex;
     gap: 0.5rem;
     align-items: center;
+  }
+
+  .setting__input-row select {
+    flex: 1;
+    min-width: 0;
   }
 
   .setting__checkbox {
