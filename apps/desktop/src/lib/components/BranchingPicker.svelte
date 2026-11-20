@@ -232,7 +232,12 @@
 
   function startPan(event: PointerEvent) {
     if (event.button !== 0) return;
-    if ((event.target as HTMLElement).closest("button")) return;
+    if (
+      (event.target as HTMLElement).closest(
+        ".map__create, .map__tools, .map__back",
+      )
+    )
+      return;
     panning = true;
     panStart = {
       x: event.clientX,
@@ -415,91 +420,6 @@
   {/if}
 
   <div class="stage">
-    <aside class="rail">
-      <h1>What are you working on?</h1>
-      <form
-        class="home__form"
-        onsubmit={(event) => {
-          event.preventDefault();
-          onCreateWorkspace(name.trim());
-        }}
-      >
-        <label class="sr-only" for="workspace-name">Workspace name</label>
-        <input
-          id="workspace-name"
-          bind:value={name}
-          required
-          maxlength={LIMITS.label}
-          placeholder="Give it a name, like Kitchen remodel"
-          autocomplete="off"
-        />
-        <button
-          class="btn btn--primary"
-          type="submit"
-          disabled={locked || !name.trim()}
-        >
-          {#if busy}<span class="spinner"></span>{/if}
-          Start workspace
-        </button>
-      </form>
-      <p class="home__hint">
-        A workspace keeps your boards, notes and AI conversations together. It’s
-        saved on this computer. Open its branch to see the canvases inside.
-      </p>
-      <p class="home__hint" id="backup-hint">
-        {#if backups}
-          A backup is a full copy of a workspace, including MCP server settings
-          that may hold credentials. Keep backup files private. Back up or
-          restore any workspace in Settings.
-        {:else}
-          Backing up workspaces needs the desktop app.
-        {/if}
-      </p>
-
-      {#if open}
-        <section class="rail__canvas" aria-label={`New canvas in ${open.name}`}>
-          <h2>{open.name}</h2>
-          <form
-            class="home__form"
-            onsubmit={(event) => {
-              event.preventDefault();
-              onCreateCanvas(title.trim());
-            }}
-          >
-            <label class="sr-only" for="canvas-title">Canvas title</label>
-            <input
-              id="canvas-title"
-              bind:value={title}
-              required
-              maxlength={LIMITS.label}
-              placeholder="Name a new canvas, like Launch plan"
-              autocomplete="off"
-            />
-            <button
-              class="btn btn--primary"
-              type="submit"
-              disabled={locked || !title.trim()}
-            >
-              {#if busy}<span class="spinner"></span>{/if}
-              Create canvas
-            </button>
-          </form>
-          <p class="home__hint">
-            A canvas is an open board for notes, AI sessions, files, web
-            previews and drawings.
-          </p>
-        </section>
-      {/if}
-
-      <p class="sr-only" role="status">{backedUp}</p>
-      {#if backedUp && !error}
-        <p class="home__hint" aria-hidden="true">{backedUp}</p>
-      {/if}
-      {#if error}
-        <p class="alert" role="alert">{error}</p>
-      {/if}
-    </aside>
-
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <section
@@ -516,14 +436,72 @@
       onwheel={onWheel}
     >
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-      <h2 class="sr-only" bind:this={mapHeading} tabindex="-1">
+      <h1 class="sr-only" bind:this={mapHeading} tabindex="-1">
         Workspaces and canvases
-      </h2>
+      </h1>
       <div
         class="map__grid"
         aria-hidden="true"
         style:background-position={`${transform.x}px ${transform.y}px`}
       ></div>
+
+      <div class="map__create">
+        <form
+          class="create"
+          aria-label="Create workspace"
+          onsubmit={(event) => {
+            event.preventDefault();
+            onCreateWorkspace(name.trim());
+          }}
+        >
+          <label class="sr-only" for="workspace-name">Workspace name</label>
+          <input
+            id="workspace-name"
+            bind:value={name}
+            required
+            maxlength={LIMITS.label}
+            placeholder="Workspace name"
+            autocomplete="off"
+          />
+          <button
+            class="btn btn--primary"
+            type="submit"
+            disabled={locked || !name.trim()}
+          >
+            {#if busy}<span class="spinner"></span>{/if}
+            Create workspace
+          </button>
+        </form>
+
+        {#if open}
+          <form
+            class="create"
+            aria-label={`Create canvas in ${open.name}`}
+            onsubmit={(event) => {
+              event.preventDefault();
+              onCreateCanvas(title.trim());
+            }}
+          >
+            <label class="sr-only" for="canvas-title">Canvas title</label>
+            <input
+              id="canvas-title"
+              bind:value={title}
+              required
+              maxlength={LIMITS.label}
+              placeholder="Canvas name"
+              autocomplete="off"
+            />
+            <button
+              class="btn btn--primary"
+              type="submit"
+              disabled={locked || !title.trim()}
+            >
+              {#if busy}<span class="spinner"></span>{/if}
+              Create canvas
+            </button>
+          </form>
+        {/if}
+      </div>
 
       {#if workspaces.length === 0}
         <div class="map__empty">
@@ -591,7 +569,6 @@
                       type="button"
                       title="Back up workspace"
                       aria-label={`Back up ${card.info.label}`}
-                      aria-describedby="backup-hint"
                       disabled={locked || !backups || !card.info.readable}
                       onclick={() => void backup(workspaceId, card.info.label)}
                     >
@@ -770,6 +747,14 @@
           <Icon name="center_focus_strong" size={18} />
         </button>
       </div>
+
+      <p class="sr-only" role="status">{backedUp}</p>
+      {#if backedUp && !error}
+        <p class="map__note" aria-hidden="true">{backedUp}</p>
+      {/if}
+      {#if error}
+        <p class="alert map__alert" role="alert">{error}</p>
+      {/if}
     </section>
   </div>
 </div>
@@ -782,49 +767,17 @@
   .stage {
     flex: 1;
     min-height: 0;
-    display: grid;
-    grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr);
-    gap: 1.25rem;
+    display: flex;
     padding: 0 2rem 1.5rem;
     box-sizing: border-box;
-  }
-
-  .rail {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    min-height: 0;
-    overflow-y: auto;
-    padding-right: 0.25rem;
-  }
-
-  .rail h1 {
-    margin: 0;
-    font-size: clamp(1.55rem, 2.6vw, 2.1rem);
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-
-  .rail h2 {
-    margin: 0;
-    font-size: 1.05rem;
-    font-weight: 600;
-    overflow-wrap: anywhere;
-  }
-
-  .rail__canvas {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid var(--line);
   }
 
   /* ------------------------------------------------------ the branch map */
 
   .map {
     position: relative;
+    flex: 1;
+    min-width: 0;
     min-height: 22rem;
     overflow: hidden;
     border: 1px solid var(--line-strong);
@@ -971,6 +924,74 @@
   .map__tools button:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+  }
+
+  .map__create {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    width: min(23rem, calc(100% - 1.7rem));
+    padding: 0.4rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .create {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .create input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.25rem;
+    padding: 0 0.7rem;
+    font: inherit;
+    font-size: 0.82rem;
+    color: var(--ink);
+    background: var(--surface-soft);
+    border: 1px solid var(--line-strong);
+    border-radius: 11px;
+    box-shadow: var(--shadow-inset);
+  }
+
+  .create input::placeholder {
+    color: var(--muted);
+  }
+
+  .create .btn {
+    flex: none;
+    min-height: 2.25rem;
+    padding: 0 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 11px;
+  }
+
+  .map__note,
+  .map__alert {
+    position: absolute;
+    left: 0.85rem;
+    bottom: 0.85rem;
+    z-index: 4;
+    margin: 0;
+    max-width: min(26rem, calc(100% - 12rem));
+  }
+
+  .map__note {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
   }
 
   /* ---------------------------------------------------------- the cards */
@@ -1157,18 +1178,29 @@
 
   @media (max-width: 900px) {
     .stage {
-      grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: auto minmax(20rem, 1fr);
-      gap: 1rem;
       padding: 0 1rem 1rem;
-    }
-
-    .rail {
-      overflow: visible;
     }
 
     .map {
       min-height: 22rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .map__create {
+      left: 0.85rem;
+      width: auto;
+    }
+
+    .map__back {
+      top: auto;
+      bottom: 0.85rem;
+    }
+
+    .map__note,
+    .map__alert {
+      bottom: 3.6rem;
+      max-width: calc(100% - 1.7rem);
     }
   }
 </style>
