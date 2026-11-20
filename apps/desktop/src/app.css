@@ -1807,6 +1807,25 @@ button.pill:disabled {
   min-height: 0;
 }
 
+/* The board dives in from the centre after the picker folded away, finishing
+   the zoom the picker's exit started. Input waits for it to land. */
+.stage--zooming-in {
+  transform-origin: 50% 50%;
+  animation: canvas-zoom-in 0.32s var(--spring) both;
+  pointer-events: none;
+}
+
+@keyframes canvas-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .canvas {
   position: relative;
   flex: 1;

@@ -541,6 +541,8 @@
   const CANVAS_ZOOM_MS = 320;
   /** A selected canvas zooms the picker away before its board loads. */
   let canvasZooming = $state(false);
+  /** Then the board itself dives in from the centre. */
+  let canvasZoomingIn = $state(false);
 
   onMount(() => {
     // Reduced motion skips the card rather than flashing it at 0.01ms.
@@ -563,6 +565,10 @@
         ? "canvas"
         : "editor",
   );
+  // A zoom-in belongs to one arrival; leaving the board clears it.
+  $effect(() => {
+    if (stage !== "editor") canvasZoomingIn = false;
+  });
   /** Top-bar waiting queue; Ctrl+J (Cmd+J on Apple) toggles it. */
   let queueOpen = $state(false);
   const apple = isApplePlatform();
@@ -2461,10 +2467,18 @@
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
       canvasZooming = true;
       await new Promise((resolve) => setTimeout(resolve, CANVAS_ZOOM_MS));
+      // Set before the board mounts so its first paint starts at scale 0.
+      canvasZoomingIn = true;
     }
     await editor.openCanvas(id);
     // A refused or failed open leaves the picker up so its error is readable.
     canvasZooming = false;
+    if (!editorState.document) canvasZoomingIn = false;
+  }
+
+  /** The board's arrival animation clears its own class when it finishes. */
+  function onStageAnimationEnd(event: AnimationEvent) {
+    if (event.animationName === "canvas-zoom-in") canvasZoomingIn = false;
   }
 
   function beforeUnload(event: BeforeUnloadEvent) {
@@ -3605,7 +3619,12 @@
       </button>
     {/snippet}
 
-    <div class="stage" data-layout={layout}>
+    <div
+      class="stage"
+      data-layout={layout}
+      class:stage--zooming-in={canvasZoomingIn}
+      onanimationend={onStageAnimationEnd}
+    >
       {#if layout === "activity-bar"}
         <nav class="rail" aria-label="Activity bar">
           {#if editorState.document}
