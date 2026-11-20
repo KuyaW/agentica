@@ -1523,37 +1523,57 @@ button.home__brand:disabled {
 
 .titlebar__controls {
   display: flex;
-  align-self: stretch;
+  align-items: center;
+  gap: 0.35rem;
   margin-left: auto;
+  padding-right: 1rem;
 }
 
+/* Each window control is a small clay chip: surface, rim, and the same puffy
+   lift on hover and squish on press as the rest of the chrome. */
 .titlebar__control {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 100%;
+  width: 1.85rem;
+  height: 1.85rem;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--surface-edge);
+  border-radius: 11px;
   color: var(--ink-soft);
-  background: transparent;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition:
-    background 0.14s ease,
-    color 0.14s ease;
+    transform 0.22s var(--spring),
+    box-shadow 0.18s ease,
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .titlebar__control:hover {
+  transform: translateY(-1px);
   color: var(--ink);
-  background: var(--surface-soft);
+  box-shadow: var(--shadow-lg);
 }
 
 .titlebar__control:active {
-  background: var(--surface);
+  transform: translateY(0) scale(0.94);
+  box-shadow: var(--shadow-press);
+}
+
+/* Close keeps the clay shape but carries the danger tint, so it reads as the
+   one destructive control without becoming a flat red block. */
+.titlebar__control--close {
+  color: var(--bad);
+  background: var(--bad-soft);
+  border-color: var(--bad-line);
 }
 
 .titlebar__control--close:hover {
   color: #ffffff;
   background: var(--bad);
+  border-color: color-mix(in srgb, var(--bad) 70%, #000000);
 }
 
 .titlebar__control--close:active {
@@ -1562,12 +1582,12 @@ button.home__brand:disabled {
 }
 
 .titlebar__control:focus-visible {
-  outline-offset: -3px;
+  outline-offset: 2px;
 }
 
 /* The palette switch sits in the app bar, clear of the window controls. */
 .titlebar > .accent-picker {
-  margin-right: 0.4rem;
+  margin-right: 0.55rem;
 }
 
 /* ----------------------------------------------------------------- topbar */
