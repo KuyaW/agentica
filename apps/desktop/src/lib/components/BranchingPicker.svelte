@@ -54,6 +54,8 @@
     error: string;
     /** Plays the cards in as the opening splash lifts away. */
     entering?: boolean;
+    /** Folds the whole picker away while a chosen canvas loads. */
+    zooming?: boolean;
     /** Desktop only: native dialogs choose the backup file. */
     backups: boolean;
     onReconnect: () => void;
@@ -78,6 +80,7 @@
     busy,
     error,
     entering = false,
+    zooming = false,
     backups,
     onReconnect,
     onRefresh,
@@ -743,7 +746,7 @@
   </div>
 {/snippet}
 
-<div class="home picker">
+<div class="home picker" class:picker--zooming={zooming}>
   <header class="home__bar">
     <span class="home__brand">
       <Logomark class="home__logo" />
@@ -1268,6 +1271,25 @@
     overflow: hidden;
     /* The canvas keeps its dot grid; the page around it stays plain. */
     background-image: none;
+  }
+
+  /* Selecting a canvas folds the picker to a point, so the board arrives as a
+     dive rather than a page swap. */
+  .picker--zooming {
+    transform-origin: 50% 50%;
+    animation: picker-zoom-out 0.32s cubic-bezier(0.6, 0, 0.8, 0.4) both;
+    pointer-events: none;
+  }
+
+  @keyframes picker-zoom-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0);
+    }
   }
 
   .stage {

@@ -537,6 +537,10 @@
   // The tail also covers the picker cards staggering in as the card lifts.
   const SPLASH_HOLD_MS = 1500;
   const SPLASH_TOTAL_MS = 2700;
+  /** Matches the picker's fold in BranchingPicker.svelte. */
+  const CANVAS_ZOOM_MS = 320;
+  /** A selected canvas zooms the picker away before its board loads. */
+  let canvasZooming = $state(false);
 
   onMount(() => {
     // Reduced motion skips the card rather than flashing it at 0.01ms.
@@ -2450,6 +2454,19 @@
     if (editorState.workspace) await editor.closeWorkspace();
   }
 
+  /** Fold the picker to a point, then load the canvas behind it. */
+  async function openCanvasWithZoom(id: string) {
+    if (canvasZooming || working) return;
+    // Reduced motion skips the dive rather than flashing at 0.01ms.
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      canvasZooming = true;
+      await new Promise((resolve) => setTimeout(resolve, CANVAS_ZOOM_MS));
+    }
+    await editor.openCanvas(id);
+    // A refused or failed open leaves the picker up so its error is readable.
+    canvasZooming = false;
+  }
+
   function beforeUnload(event: BeforeUnloadEvent) {
     if (
       !editorState.dirty &&
@@ -3311,12 +3328,13 @@
       busy={working}
       error={editorState.error}
       entering={boot === "enter"}
+      zooming={canvasZooming}
       onRefresh={() => void editor.listWorkspaces()}
       onCreateWorkspace={(name) => void editor.createWorkspace(name)}
       onOpenWorkspace={(id) => void editor.openWorkspace(id)}
       onCollapse={() => void backToWorkspaces()}
       onCreateCanvas={(title) => void editor.createCanvas(title)}
-      onOpenCanvas={(id) => void editor.openCanvas(id)}
+      onOpenCanvas={(id) => void openCanvasWithZoom(id)}
       onDeleteWorkspace={(id) =>
         void requestRemoval(
           id,
