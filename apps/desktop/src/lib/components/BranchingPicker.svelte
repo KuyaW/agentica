@@ -43,6 +43,8 @@
     reconnecting: boolean;
     busy: boolean;
     error: string;
+    /** Plays the cards in as the opening splash lifts away. */
+    entering?: boolean;
     /** Desktop only: native dialogs choose the backup file. */
     backups: boolean;
     onReconnect: () => void;
@@ -66,6 +68,7 @@
     reconnecting,
     busy,
     error,
+    entering = false,
     backups,
     onReconnect,
     onRefresh,
@@ -346,6 +349,11 @@
   let mapWidth = $state(0);
   let mapHeight = $state(0);
   let transform = $state({ x: 0, y: 0, k: 1 });
+  /** Map centre in world units: the point entering cards bloom out of. */
+  const enterFrom = $derived({
+    x: transform.k ? (mapWidth / 2 - transform.x) / transform.k : 0,
+    y: transform.k ? (mapHeight / 2 - transform.y) / transform.k : 0,
+  });
   let panning = $state(false);
   let panStart: { x: number; y: number; tx: number; ty: number } | null = null;
   // The frame of a camera glide in flight, so a new framing or a pan can take
@@ -691,6 +699,7 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <section
       class="map"
+      class:map--entering={entering}
       class:map--panning={panning}
       bind:this={mapEl}
       bind:clientWidth={mapWidth}
@@ -836,7 +845,7 @@
             {/each}
           </svg>
 
-          {#each cards as card (card.node.id)}
+          {#each cards as card, index (card.node.id)}
             {@const workspaceId = card.info.workspaceId}
             {@const parent = card.node.parentId
               ? layout.get(card.node.parentId)
@@ -847,9 +856,14 @@
                   y: parent.pos.y - card.node.pos.y,
                 }
               : { x: 0, y: 0 }}
+            {@const enterX = enterFrom.x - (card.node.pos.x + NODE_W / 2)}
+            {@const enterY = enterFrom.y - (card.node.pos.y + NODE_H / 2)}
             <div
               class="map__node"
               style:transform={`translate3d(${card.node.pos.x}px, ${card.node.pos.y}px, 0)`}
+              style:--enter-index={Math.min(index, 11)}
+              style:--enter-x={`${enterX}px`}
+              style:--enter-y={`${enterY}px`}
               in:foldCard={{
                 from: fold,
                 at: card.node.pos,
@@ -1419,6 +1433,34 @@
     border-radius: 18px;
     background: var(--surface);
     box-shadow: var(--shadow-sm);
+  }
+
+  /* As the splash lifts, the cards bloom out of the map centre: each starts as
+     a small puff in the middle and springs out to its own place, one after
+     another in reading order. The hold-back lets the card turn mostly
+     transparent first, and the last card lands before the splash unmounts. */
+  .map--entering .map__node .card {
+    animation: map-card-in 0.45s var(--spring) both;
+    animation-delay: calc(300ms + var(--enter-index, 0) * 35ms);
+  }
+
+  @keyframes map-card-in {
+    from {
+      opacity: 0;
+      transform: translate(var(--enter-x, 0px), var(--enter-y, 0px)) scale(0.42);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* The global reduced-motion rule only shortens the duration; drop the
+     stagger so no card waits, invisible, for its delay. */
+  @media (prefers-reduced-motion: reduce) {
+    .map--entering .map__node .card {
+      animation: none;
+    }
   }
 
   .card--root {

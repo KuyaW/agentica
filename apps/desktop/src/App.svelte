@@ -534,8 +534,9 @@
   /** Opening card: logo, then wordmark, then the shell settles in behind it. */
   let boot = $state<"hold" | "enter" | "ready">("hold");
   // Long enough to read the mark and the name, short enough to stay polite.
+  // The tail also covers the picker cards staggering in as the card lifts.
   const SPLASH_HOLD_MS = 1500;
-  const SPLASH_TOTAL_MS = 2400;
+  const SPLASH_TOTAL_MS = 2700;
 
   onMount(() => {
     // Reduced motion skips the card rather than flashing it at 0.01ms.
@@ -3312,6 +3313,7 @@
       onReconnect={() => void reconnect()}
       busy={working}
       error={editorState.error}
+      entering={boot === "enter"}
       onRefresh={() => void editor.listWorkspaces()}
       onCreateWorkspace={(name) => void editor.createWorkspace(name)}
       onOpenWorkspace={(id) => void editor.openWorkspace(id)}
