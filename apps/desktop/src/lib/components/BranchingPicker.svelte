@@ -507,51 +507,63 @@
       <div class="map__create" class:map__create--slim={!open && !naming}>
         <!-- An open workspace is the job at hand, so its own creation is out of
              the way and only the canvas form stays. -->
-        {#if !open && naming}
-          <form
-            class="create"
-            aria-label="Create workspace"
-            onsubmit={(event) => {
-              event.preventDefault();
-              void submitWorkspace();
-            }}
-            onfocusout={leaveNaming}
-          >
-            <label class="sr-only" for="workspace-name">Workspace name</label>
-            <input
-              id="workspace-name"
-              bind:this={nameInput}
-              bind:value={name}
-              required
-              maxlength={LIMITS.label}
-              placeholder="Workspace name"
-              autocomplete="off"
-              onkeydown={(event) => {
-                if (event.key !== "Escape") return;
-                event.preventDefault();
-                void stopNaming();
-              }}
-            />
-            <button
-              class="btn btn--primary"
-              type="submit"
-              disabled={locked || !name.trim()}
-            >
-              {#if busy}<span class="spinner"></span>{/if}
-              Create workspace
-            </button>
-          </form>
-        {:else if !open}
-          <button
-            class="btn btn--primary create__add"
-            type="button"
-            bind:this={addButton}
-            disabled={locked}
-            onclick={() => void startNaming()}
-          >
-            <Icon name="add" size={18} />
-            Add workspace
-          </button>
+        {#if !open}
+          <!-- The form and its button share one cell, so the cross-fade never
+               stacks them and the panel keeps a single row while it morphs. -->
+          <div class="create__swap">
+            {#if naming}
+              <form
+                class="create"
+                aria-label="Create workspace"
+                onsubmit={(event) => {
+                  event.preventDefault();
+                  void submitWorkspace();
+                }}
+                onfocusout={leaveNaming}
+                in:fly={{ x: 6, duration: 200, easing: cubicOut }}
+                out:fade={{ duration: 120 }}
+              >
+                <label class="sr-only" for="workspace-name"
+                  >Workspace name</label
+                >
+                <input
+                  id="workspace-name"
+                  bind:this={nameInput}
+                  bind:value={name}
+                  required
+                  maxlength={LIMITS.label}
+                  placeholder="Workspace name"
+                  autocomplete="off"
+                  onkeydown={(event) => {
+                    if (event.key !== "Escape") return;
+                    event.preventDefault();
+                    void stopNaming();
+                  }}
+                />
+                <button
+                  class="btn btn--primary"
+                  type="submit"
+                  disabled={locked || !name.trim()}
+                >
+                  {#if busy}<span class="spinner"></span>{/if}
+                  Create workspace
+                </button>
+              </form>
+            {:else}
+              <button
+                class="btn btn--primary create__add"
+                type="button"
+                bind:this={addButton}
+                disabled={locked}
+                in:fade={{ duration: 160 }}
+                out:fade={{ duration: 100 }}
+                onclick={() => void startNaming()}
+              >
+                <Icon name="add" size={18} />
+                Add workspace
+              </button>
+            {/if}
+          </div>
         {/if}
 
         {#if open}
@@ -1049,12 +1061,26 @@
     border-radius: 16px;
     background: var(--surface);
     box-shadow: var(--shadow-sm);
+    transition: width 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .create {
     display: flex;
     align-items: center;
     gap: 0.35rem;
+  }
+
+  /* One cell for both states: the outgoing element stays in place while it
+     fades, so the panel never doubles its height mid-morph. */
+  .create__swap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .create__swap > .create,
+  .create__swap > .create__add {
+    grid-area: 1 / 1;
+    min-width: 0;
   }
 
   .create input {
@@ -1084,10 +1110,14 @@
     border-radius: 11px;
   }
 
-  /* With only the Add workspace button inside, the panel hugs it instead of
-     leaving a stretched pill across the width the forms need. */
+  /* Collapsed to just Add workspace the panel is narrow; opening the naming
+     form widens it back out, so the two states morph rather than swap. */
   .map__create--slim {
-    width: auto;
+    width: min(11.5rem, calc(100% - 1.7rem));
+  }
+
+  .create__add {
+    width: 100%;
   }
 
   .map__note,
