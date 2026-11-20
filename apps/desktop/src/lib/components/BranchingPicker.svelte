@@ -135,9 +135,15 @@
     _node: Element,
     {
       from,
+      at = { x: 0, y: 0 },
       delay = 0,
       duration = 260,
-    }: { from: { x: number; y: number }; delay?: number; duration?: number },
+    }: {
+      from: { x: number; y: number };
+      at?: { x: number; y: number };
+      delay?: number;
+      duration?: number;
+    },
   ): TransitionConfig {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     return {
@@ -145,8 +151,8 @@
       duration: reduced ? 0 : duration,
       easing: cubicOut,
       css: (t) =>
-        `opacity: ${t}; transform: translate(${from.x * (1 - t)}px, ${
-          from.y * (1 - t)
+        `opacity: ${t}; transform: translate(${at.x + from.x * (1 - t)}px, ${
+          at.y + from.y * (1 - t)
         }px) scale(${0.62 + 0.38 * t});`,
     };
   }
@@ -781,21 +787,21 @@
             <div
               class="map__node"
               style:transform={`translate3d(${card.node.pos.x}px, ${card.node.pos.y}px, 0)`}
+              in:foldCard={{
+                from: fold,
+                at: card.node.pos,
+                delay: unfoldWait(cards, card.node.id),
+                duration: 280,
+              }}
+              out:foldCard={{
+                from: fold,
+                at: card.node.pos,
+                delay: foldWait(lastFrame.cards, card.node.id),
+                duration: FOLD_OUT,
+              }}
             >
               {#if card.info.kind === "root"}
-                <div
-                  class="card card--root"
-                  in:foldCard={{
-                    from: fold,
-                    delay: unfoldWait(cards, card.node.id),
-                    duration: 280,
-                  }}
-                  out:foldCard={{
-                    from: fold,
-                    delay: foldWait(lastFrame.cards, card.node.id),
-                    duration: FOLD_OUT,
-                  }}
-                >
+                <div class="card card--root">
                   <button
                     class="card__open"
                     type="button"
@@ -815,20 +821,7 @@
               {:else if card.info.kind === "workspace"}
                 {@const expanded = open?.id === workspaceId}
                 {@const confirmingCard = isConfirming("workspace", workspaceId)}
-                <div
-                  class="card"
-                  class:card--open={expanded}
-                  in:foldCard={{
-                    from: fold,
-                    delay: unfoldWait(cards, card.node.id),
-                    duration: 280,
-                  }}
-                  out:foldCard={{
-                    from: fold,
-                    delay: foldWait(lastFrame.cards, card.node.id),
-                    duration: FOLD_OUT,
-                  }}
-                >
+                <div class="card" class:card--open={expanded}>
                   <button
                     class="card__open"
                     type="button"
@@ -920,19 +913,7 @@
                   card.node.id.slice("canvas:".length),
                 )}
                 {@const canvasId = card.node.id.slice("canvas:".length)}
-                <div
-                  class="card"
-                  in:foldCard={{
-                    from: fold,
-                    delay: unfoldWait(cards, card.node.id),
-                    duration: 280,
-                  }}
-                  out:foldCard={{
-                    from: fold,
-                    delay: foldWait(lastFrame.cards, card.node.id),
-                    duration: FOLD_OUT,
-                  }}
-                >
+                <div class="card">
                   <button
                     class="card__open"
                     type="button"
