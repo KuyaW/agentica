@@ -1128,7 +1128,9 @@
     min-width: 0;
     min-height: 22rem;
     overflow: hidden;
-    border: 1px solid var(--line-strong);
+    /* A touch more edge than the hairline: with the dots gone around it, the
+       panel needs to read as a surface rather than dissolve into the page. */
+    border: 1px solid color-mix(in oklab, var(--line-strong) 45%, var(--muted));
     border-radius: var(--radius);
     background: var(--surface);
     box-shadow: var(--shadow-inset);
