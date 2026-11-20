@@ -1130,11 +1130,11 @@
     min-width: 0;
     min-height: 22rem;
     overflow: hidden;
-    /* A touch more edge than the hairline: with the dots gone around it, the
-       panel needs to read as a surface rather than dissolve into the page. */
-    border: 1px solid color-mix(in oklab, var(--line-strong) 45%, var(--muted));
+    /* The same recessed tray as the editor canvas, so the map and the board
+       read as one surface instead of two shades of the same panel. */
+    border: 1px solid var(--canvas-edge);
     border-radius: var(--radius);
-    background: var(--surface);
+    background: var(--canvas);
     box-shadow: var(--shadow-inset);
     cursor: grab;
     touch-action: none;
@@ -1149,11 +1149,11 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    /* The softer line token: the grid reads as texture, not as a pattern. */
+    /* The canvas dot token: the grid reads as texture, not as a pattern. */
     background-image: radial-gradient(
       circle,
-      var(--line) 1.2px,
-      transparent 1.2px
+      var(--canvas-dot) 1.3px,
+      transparent 1.3px
     );
     background-size: 26px 26px;
     /* Melt the lattice out at every edge instead of clipping it at the border. */
@@ -1184,7 +1184,7 @@
     background: radial-gradient(
       ellipse at center,
       transparent 58%,
-      color-mix(in oklab, #1b1633 10%, transparent) 100%
+      var(--canvas-vignette) 100%
     );
   }
 

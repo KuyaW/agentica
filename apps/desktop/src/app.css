@@ -35,6 +35,24 @@
     color-mix(in oklab, var(--accent) 8%, #f2efff) 100%
   );
   --surface-well: linear-gradient(160deg, #efeafd 0%, #f8f6ff 100%);
+  /* The canvas is a recessed tray, a shade deeper than the chrome around it,
+     so cards sit on it as raised clay instead of blending into the board. */
+  --canvas: linear-gradient(165deg, #e9e4f9 0%, #ded9f2 100%);
+  --canvas-dot: rgba(114, 97, 184, 0.3);
+  --canvas-edge: rgba(255, 255, 255, 0.55);
+  --canvas-vignette: color-mix(in oklab, #1b1633 12%, transparent);
+  /* Cards carry a stronger lift than the chrome's --shadow-sm so their edge
+     separates from the tray even where the two colours are close. */
+  --shadow-card:
+    0 14px 26px -18px rgba(74, 56, 150, 0.6),
+    0 4px 10px -6px rgba(74, 56, 150, 0.26),
+    inset 0 -4px 8px rgba(138, 120, 220, 0.12),
+    inset 0 4px 8px rgba(255, 255, 255, 0.95);
+  --shadow-card-hover:
+    0 22px 34px -20px rgba(74, 56, 150, 0.7),
+    0 8px 16px -8px rgba(74, 56, 150, 0.32),
+    inset 0 -4px 8px rgba(138, 120, 220, 0.16),
+    inset 0 4px 8px rgba(255, 255, 255, 0.98);
   --ink: #3f3763;
   --ink-soft: #625a8a;
   --muted: #8b85ad;
@@ -136,6 +154,18 @@
     transparent 100%
   );
   --surface-well: linear-gradient(160deg, #1a1628 0%, #221d33 100%);
+  --canvas: linear-gradient(165deg, #17131f 0%, #1d1829 100%);
+  --canvas-dot: rgba(180, 167, 240, 0.22);
+  --canvas-edge: rgba(255, 255, 255, 0.06);
+  --canvas-vignette: color-mix(in oklab, #000000 35%, transparent);
+  --shadow-card:
+    0 16px 28px -18px rgba(0, 0, 0, 0.92), 0 4px 10px -6px rgba(0, 0, 0, 0.55),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.07);
+  --shadow-card-hover:
+    0 24px 36px -20px rgba(0, 0, 0, 0.95), 0 8px 16px -8px rgba(0, 0, 0, 0.6),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.09);
   --ink: #ece9ff;
   --ink-soft: #b7b0dd;
   --muted: #837da8;
@@ -270,6 +300,17 @@
     var(--accent) 8%,
     rgba(252, 251, 255, 0.78)
   );
+  --canvas: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--accent) 12%, #e9e4f9) 0%,
+    color-mix(in oklab, var(--accent) 10%, #ded9f2) 100%
+  );
+  --canvas-dot: color-mix(in oklab, var(--accent) 30%, rgba(114, 97, 184, 0.3));
+  --canvas-edge: color-mix(
+    in oklab,
+    var(--accent) 6%,
+    rgba(255, 255, 255, 0.55)
+  );
   --line: color-mix(in oklab, var(--accent) 16%, rgba(124, 108, 196, 0.16));
   --line-strong: color-mix(
     in oklab,
@@ -334,6 +375,16 @@
   );
   --surface-solid: color-mix(in oklab, var(--accent) 9%, #262138);
   --surface-soft: color-mix(in oklab, var(--accent) 8%, #221e33);
+  --canvas: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--accent) 8%, #17131f) 0%,
+    color-mix(in oklab, var(--accent) 7%, #1d1829) 100%
+  );
+  --canvas-dot: color-mix(
+    in oklab,
+    var(--accent) 28%,
+    rgba(180, 167, 240, 0.22)
+  );
   --line: color-mix(in oklab, var(--accent) 14%, rgba(180, 167, 240, 0.16));
   --line-strong: color-mix(
     in oklab,
@@ -1704,10 +1755,10 @@ button.pill:disabled {
   position: relative;
   flex: 1;
   min-width: 0;
-  /* The same surface as the workspace map: gradient clay, a defined edge and
-     the recessed shadow, so editing feels like working on the same board. */
-  background: var(--surface);
-  border: 1px solid color-mix(in oklab, var(--line-strong) 45%, var(--muted));
+  /* A recessed tray, deeper than the panels around it (as in the picker's
+     map), so the cards' light clay reads as raised off the board. */
+  background: var(--canvas);
+  border: 1px solid var(--canvas-edge);
   border-radius: var(--radius);
   box-shadow: var(--shadow-inset);
   /* Float the board off the rail and chat, the way the picker's map floats on
@@ -1725,8 +1776,8 @@ button.pill:disabled {
   pointer-events: none;
   background-image: radial-gradient(
     circle,
-    var(--line) 1.2px,
-    transparent 1.2px
+    var(--canvas-dot) 1.3px,
+    transparent 1.3px
   );
   background-size: 26px 26px;
   /* Melt the lattice out at every edge, as on the workspace map. */
@@ -1759,7 +1810,7 @@ button.pill:disabled {
   background: radial-gradient(
     ellipse at center,
     transparent 58%,
-    color-mix(in oklab, #1b1633 10%, transparent) 100%
+    var(--canvas-vignette) 100%
   );
 }
 
@@ -2948,7 +2999,17 @@ button.pill:disabled {
   background: var(--card-bg);
   border: 1px solid var(--card-line);
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 0.22s var(--spring),
+    box-shadow 0.24s ease;
+}
+
+/* A card lifts under the pointer, the way the workspace tiles do, so it reads
+   as a draggable object rather than text painted on the board. */
+.canvas-text--framed:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Plain text shows its box (hidden text, wire ends) unless it is a title; no
