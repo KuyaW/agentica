@@ -8,11 +8,15 @@ export const WORKSPACE_ICONS = [
   "forum",
   "tune",
   "dashboard",
+  "workspaces",
 ] as const;
 
 export type WorkspaceIcon = (typeof WORKSPACE_ICONS)[number];
 
 export const DEFAULT_WORKSPACE_ICON: WorkspaceIcon = "folder_open";
+
+/** The hub that gathers every workspace keeps the group glyph by default. */
+export const DEFAULT_HUB_ICON: WorkspaceIcon = "workspaces";
 
 /** Accessible names for the palette; the glyph names are not readable prose. */
 export const WORKSPACE_ICON_LABELS: Record<WorkspaceIcon, string> = {
@@ -24,6 +28,7 @@ export const WORKSPACE_ICON_LABELS: Record<WorkspaceIcon, string> = {
   forum: "Conversation",
   tune: "Tune",
   dashboard: "Dashboard",
+  workspaces: "Workspaces",
 };
 
 const STORAGE_KEY = "agentica.workspaceIcons";

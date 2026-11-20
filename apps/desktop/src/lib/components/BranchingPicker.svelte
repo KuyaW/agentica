@@ -6,6 +6,7 @@
   import Icon from "./Icon.svelte";
   import Logomark from "./Logomark.svelte";
   import {
+    DEFAULT_HUB_ICON,
     DEFAULT_WORKSPACE_ICON,
     readWorkspaceIcons,
     saveWorkspaceIcons,
@@ -247,13 +248,17 @@
 
   /* ------------------------------------------------- workspace icons */
 
+  // The hub is stored under the map's root key, beside the workspace ids.
+  const rootKey = "root";
+
   // Badge choices are a device preference, like the theme and the layout.
   let icons = $state<Record<string, WorkspaceIcon>>(readWorkspaceIcons());
   let iconEditor = $state<string | null>(null);
   const iconTriggers = new Map<string, HTMLButtonElement>();
   const iconChoices = new Map<string, HTMLButtonElement>();
 
-  const iconFor = (id: string) => icons[id] ?? DEFAULT_WORKSPACE_ICON;
+  const iconFor = (id: string) =>
+    icons[id] ?? (id === rootKey ? DEFAULT_HUB_ICON : DEFAULT_WORKSPACE_ICON);
 
   function trackIconTrigger(node: HTMLButtonElement, id: string) {
     iconTriggers.set(id, node);
@@ -305,7 +310,6 @@
 
   /* -------------------------------------------------- the branching map */
 
-  const rootKey = "root";
   const workspaceKey = (id: string) => `workspace:${id}`;
   const canvasKey = (id: string) => `canvas:${id}`;
 
@@ -714,6 +718,31 @@
   }
 </script>
 
+{#snippet iconPalette(id: string, label: string)}
+  <div
+    class="card__icons"
+    id={`workspace-icons-${id}`}
+    role="toolbar"
+    aria-label={`Icon for ${label}`}
+  >
+    {#each WORKSPACE_ICONS as icon (icon)}
+      <button
+        class="card__icon-choice"
+        type="button"
+        aria-pressed={iconFor(id) === icon}
+        aria-label={WORKSPACE_ICON_LABELS[icon]}
+        title={WORKSPACE_ICON_LABELS[icon]}
+        use:trackIconChoice={`${id}:${icon}`}
+        onkeydown={(event) => onIconKeydown(event, id)}
+        onfocusout={(event) => leaveIconEditor(event, id)}
+        onclick={() => chooseIcon(id, icon)}
+      >
+        <Icon name={icon} size={20} />
+      </button>
+    {/each}
+  </div>
+{/snippet}
+
 <div class="home picker">
   <header class="home__bar">
     <span class="home__brand">
@@ -944,7 +973,24 @@
               }}
             >
               {#if card.info.kind === "root"}
+                {@const editingIcon = iconEditor === rootKey}
                 <div class="card card--root">
+                  <button
+                    class="card__badge card__badge--workspace"
+                    type="button"
+                    title="Change Workspaces icon"
+                    aria-label={`Change icon for ${card.info.label}`}
+                    aria-expanded={editingIcon}
+                    aria-controls={`workspace-icons-${rootKey}`}
+                    disabled={locked}
+                    use:trackIconTrigger={rootKey}
+                    onclick={() =>
+                      editingIcon
+                        ? void closeIconEditor(rootKey)
+                        : void openIconEditor(rootKey)}
+                  >
+                    <Icon name={iconFor(rootKey)} size={17} />
+                  </button>
                   <button
                     class="card__open"
                     type="button"
@@ -952,20 +998,19 @@
                     title={open ? "Show every workspace" : "Workspaces"}
                     onclick={onCollapse}
                   >
-                    <span class="card__badge"
-                      ><Icon name="workspaces" size={20} /></span
-                    >
                     <span class="card__copy">
                       <span class="card__name">{card.info.label}</span>
                       <span class="card__meta">{card.info.meta}</span>
                     </span>
                   </button>
                 </div>
+                {#if editingIcon}
+                  {@render iconPalette(rootKey, card.info.label)}
+                {/if}
               {:else if card.info.kind === "workspace"}
                 {@const expanded = open?.id === workspaceId}
                 {@const confirmingCard = isConfirming("workspace", workspaceId)}
                 {@const editingIcon = iconEditor === workspaceId}
-                {@const paletteId = `workspace-icons-${workspaceId}`}
                 <div class="card" class:card--open={expanded}>
                   <button
                     class="card__badge card__badge--workspace"
@@ -973,7 +1018,7 @@
                     title="Change workspace icon"
                     aria-label={`Change icon for ${card.info.label}`}
                     aria-expanded={editingIcon}
-                    aria-controls={paletteId}
+                    aria-controls={`workspace-icons-${workspaceId}`}
                     disabled={locked || confirmingCard}
                     use:trackIconTrigger={workspaceId}
                     onclick={() =>
@@ -1031,29 +1076,7 @@
                 </div>
 
                 {#if editingIcon}
-                  <div
-                    class="card__icons"
-                    id={paletteId}
-                    role="toolbar"
-                    aria-label={`Icon for ${card.info.label}`}
-                  >
-                    {#each WORKSPACE_ICONS as icon (icon)}
-                      <button
-                        class="card__icon-choice"
-                        type="button"
-                        aria-pressed={iconFor(workspaceId) === icon}
-                        aria-label={WORKSPACE_ICON_LABELS[icon]}
-                        title={WORKSPACE_ICON_LABELS[icon]}
-                        use:trackIconChoice={`${workspaceId}:${icon}`}
-                        onkeydown={(event) => onIconKeydown(event, workspaceId)}
-                        onfocusout={(event) =>
-                          leaveIconEditor(event, workspaceId)}
-                        onclick={() => chooseIcon(workspaceId, icon)}
-                      >
-                        <Icon name={icon} size={16} />
-                      </button>
-                    {/each}
-                  </div>
+                  {@render iconPalette(workspaceId, card.info.label)}
                 {/if}
 
                 {#if confirmingCard}
@@ -1797,7 +1820,7 @@
   }
 
   /* The icon palette hangs below the card, like the delete confirmation, so
-     all eight choices stay outside the 64px card. */
+     every choice stays outside the 64px card. */
   .card__icons {
     position: absolute;
     top: calc(100% + 6px);
@@ -1805,7 +1828,7 @@
     z-index: 3;
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 4px;
     width: 216px;
     padding: 8px;
