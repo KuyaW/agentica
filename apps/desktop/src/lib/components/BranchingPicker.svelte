@@ -492,7 +492,9 @@
       ></div>
 
       <div class="map__create">
-        {#if naming}
+        <!-- An open workspace is the job at hand, so its own creation is out of
+             the way and only the canvas form stays. -->
+        {#if !open && naming}
           <form
             class="create"
             aria-label="Create workspace"
@@ -525,7 +527,7 @@
               Create workspace
             </button>
           </form>
-        {:else}
+        {:else if !open}
           <button
             class="btn btn--primary create__add"
             type="button"
@@ -1123,6 +1125,44 @@
     box-shadow:
       0 0 0 2px var(--accent-soft),
       var(--shadow-sm);
+  }
+
+  /* The open branch keeps one ripple going, so the map always shows which
+     card the canvases below belong to. Two rings offset in time keep it
+     breathing without a gap. */
+  .card--open::before,
+  .card--open::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border: 1.5px solid var(--accent);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: card-ripple 2.2s ease-out infinite;
+  }
+
+  .card--open::after {
+    animation-delay: 1.1s;
+  }
+
+  @keyframes card-ripple {
+    from {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.1);
+    }
+  }
+
+  /* The global reduced-motion rule only shortens each iteration; stop them. */
+  @media (prefers-reduced-motion: reduce) {
+    .card--open::before,
+    .card--open::after {
+      animation: none;
+      opacity: 0;
+    }
   }
 
   /* The hub is a control only while a branch is open; when it is not, it
