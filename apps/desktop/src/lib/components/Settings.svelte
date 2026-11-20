@@ -961,7 +961,7 @@
 
   .settings__title {
     margin: 0;
-    font-size: 1.45rem;
+    font-size: 1.2rem;
     font-weight: 600;
   }
 

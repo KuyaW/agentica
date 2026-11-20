@@ -111,7 +111,7 @@
   >
     <header class="modal__head">
       <span class="modal__icon"
-        ><Icon name={icon} size={fullscreen ? 24 : 22} /></span
+        ><Icon name={icon} size={fullscreen ? 18 : 22} /></span
       >
       <div class="modal__titles">
         <h1>{title}</h1>

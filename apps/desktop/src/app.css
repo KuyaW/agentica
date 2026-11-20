@@ -838,13 +838,13 @@ label {
 }
 
 .modal--full .modal__icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 20px;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 13px;
 }
 
 .modal--full .modal__titles h1 {
-  font-size: 1.6rem;
+  font-size: 1.35rem;
 }
 
 /* Full-screen pages lead with Back, like a phone's settings app. */
