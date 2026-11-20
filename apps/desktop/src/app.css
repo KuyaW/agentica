@@ -900,8 +900,11 @@ label {
   display: flex;
   flex-direction: column;
   background-color: transparent;
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-image: radial-gradient(
+    var(--line-strong) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 26px 26px;
 }
 
 .home__bar {
@@ -1687,6 +1690,22 @@ button.pill:disabled {
   flex: 1;
   min-width: 0;
   background: transparent;
+}
+
+/* Screen-space dot grid, as in the reference canvas: spacing stays the same at
+   every zoom while the origin follows the camera, so the texture slides under
+   the nodes when the view pans and still reads as part of the clay backdrop. */
+.canvas__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    var(--line-strong) 1.2px,
+    transparent 1.2px
+  );
+  background-size: 26px 26px;
 }
 
 .canvas__drop {

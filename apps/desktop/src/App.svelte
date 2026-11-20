@@ -150,7 +150,6 @@
     type Tool,
   } from "./lib/tools";
   import {
-    Background,
     MarkerType,
     SelectionMode,
     SvelteFlow,
@@ -566,7 +565,6 @@
       if (document.activeElement === document.body) settingsButton?.focus();
     });
   });
-  const dark = $derived(theme === "dark");
   const connected = $derived(status === "connected");
   const working = $derived(editorState.busy || editorState.saving || busy);
   const canEdit = $derived(connected && !working && !editorState.dirty);
@@ -3703,6 +3701,11 @@
         ondragleave={leaveFileDrag}
         ondrop={dropFiles}
       >
+        <div
+          class="canvas__grid"
+          aria-hidden="true"
+          style={`background-position: ${viewport.x}px ${viewport.y}px`}
+        ></div>
         <input
           hidden
           type="file"
@@ -3788,7 +3791,6 @@
             }}
             onmove={(_, next) => editor.setViewport(next)}
           >
-            <Background patternColor={dark ? "#332e4a" : "#d9d2f2"} gap={24} />
             <ViewportSync />
             <ViewportPortal target="back">
               {#each nodeGroupBoxes as box (box.groupId)}
