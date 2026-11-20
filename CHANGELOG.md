@@ -12,6 +12,14 @@ installers and publishes the release. Keep validation evidence in the
 
 ## Unreleased
 
+### Branching workspace and canvas picker (2026-11-20)
+
+- Changed: the separate workspace and canvas pickers are now one branching
+  screen. A Workspaces card sits in the middle, saved workspaces branch out
+  around it, and opening a workspace unfolds its canvases from that branch. The
+  map pans and zooms like the file canvas, and creating a workspace or canvas
+  stays beside it on the same page.
+
 ## 0.3.0 — 2026-11-12
 
 ### Canvas edit proposals (2026-11-12)

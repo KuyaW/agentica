@@ -15,8 +15,12 @@ How to use each Agentica feature. To install and start the app, see
 
 ## Canvas basics
 
-A workspace holds canvases. Create or reopen them from the start screen. On a
-canvas you can add text and shapes, move and resize them, and pan and zoom. All
+A workspace holds canvases. Create or reopen them from the start screen: the
+Workspaces card sits in the middle, your saved workspaces branch out around it,
+and opening one unfolds its canvases from that branch. Drag the map to pan it,
+scroll or use the map controls to zoom, and **All workspaces** folds the open
+branch away. On a canvas you can add text and shapes, move and resize them, and
+pan and zoom. All
 changes save automatically. If a save fails, the canvas says so and offers
 **Retry save** without discarding your edits.
 
@@ -47,7 +51,7 @@ The choice applies immediately, keeps open panels, sizes, selection, drafts, and
 running sessions, and is remembered on this device for every canvas. If the
 browser can't store it, Settings says it applies to this window only. Chat,
 drawing tools, save status, and the waiting-sessions bell stay where they are,
-and the workspace and canvas pickers look the same in both layouts.
+and the branching workspace and canvas picker looks the same in both layouts.
 
 ### Selecting, grouping, and deleting
 

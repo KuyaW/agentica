@@ -74,7 +74,7 @@ Text and surfaces that the canvas library draws over the canvas, including its a
 
 ### Requirement: Informative workspace tiles
 
-Each workspace tile on the home screen SHALL show the workspace's name and the number of canvases it contains. It SHALL NOT show decorative preview art that is identical for every workspace. A workspace this build cannot read SHALL show its identifier and no canvas count. The tile's back-up and delete actions SHALL sit in their own area of the tile, never on top of other tile content, and SHALL keep their existing accessible names and confirmation behavior.
+Each workspace card on the branching screen SHALL show the workspace's name and the number of canvases it contains. It SHALL NOT show decorative preview art that is identical for every workspace. A workspace this build cannot read SHALL show its identifier and no canvas count. The card's back-up and delete actions SHALL sit in their own area of the card, never on top of other card content, and SHALL keep their existing accessible names and confirmation behavior.
 
 #### Scenario: Two workspaces with different contents
 
@@ -130,54 +130,36 @@ The canvas top bar SHALL present saving as one control that shows the current st
 - **WHEN** a save fails and the edits remain unsaved
 - **THEN** the control reads "Retry save" in an error style and activating it retries the save
 
-### Requirement: Canvas picker is a full page
+### Requirement: Branching workspace and canvas picker
 
-After the user opens a workspace, the canvas picker SHALL fill the window as a page with the same top bar and main column layout as the workspace home, not as a dialog over a backdrop. The page SHALL show, in order: a heading naming the workspace, one create row with a canvas title field and a create button, and the workspace's saved canvases as tiles. Each tile SHALL show the canvas title, open the canvas when activated, and keep a delete action in its own tile area that never overlaps the title. Delete SHALL keep its inline confirmation and accessible names. When the workspace has no canvases, the page SHALL show an empty-state message in place of the tiles. Settings SHALL remain reachable from the top bar.
+The workspace and canvas pickers SHALL be one branching screen, not a sequence of pages. The screen SHALL show a Workspaces card in the middle of a map; the saved workspaces SHALL branch out from it, and opening a workspace SHALL unfold its canvases from that workspace's branch. Each workspace card SHALL show its name and canvas count and SHALL keep its back-up and delete actions. Each canvas card SHALL show its canvas title, open the canvas when activated, and keep a delete action with inline confirmation and accessible names. The map SHALL support panning and zooming, and SHALL offer zoom and fit controls with accessible names. A create-workspace row SHALL stay on the screen; while a workspace is open, a create-canvas row for that workspace SHALL also stay on the screen. When there are no workspaces, the map SHALL show an empty-state message. Settings SHALL remain reachable from the top bar.
 
-#### Scenario: Open a workspace with saved canvases
+#### Scenario: Open a workspace branch
 
 - **WHEN** the user opens a workspace that contains canvases "dol" and "Launch plan"
-- **THEN** the page shows the workspace name in its heading, a create row, and one tile per canvas
-- **AND** no dialog backdrop is shown
+- **THEN** the Workspaces card stays in the middle and one card appears on that workspace's branch for each canvas
+- **AND** the create-canvas row names the open workspace
 
-#### Scenario: Open a canvas from its tile
+#### Scenario: Collapse the open branch
 
-- **WHEN** the user activates the "Launch plan" tile
+- **WHEN** the user has opened a workspace branch and activates "All workspaces"
+- **THEN** the canvas cards fold away and only the workspace cards remain
+
+#### Scenario: Open a canvas from its card
+
+- **WHEN** the user activates the "Launch plan" canvas card
 - **THEN** that canvas opens
 
-#### Scenario: Delete a canvas from its tile
+#### Scenario: Delete a canvas from its card
 
-- **WHEN** the user selects the delete action on a tile
-- **THEN** the tile asks for confirmation before anything is removed
-- **AND** cancelling restores the tile and returns focus to its delete action
+- **WHEN** the user selects the delete action on a canvas card
+- **THEN** the card asks for confirmation before anything is removed
+- **AND** cancelling restores the card and returns focus to its delete action
 
-#### Scenario: Empty workspace
+#### Scenario: Empty workspace list
 
-- **WHEN** the user opens a workspace with no canvases
-- **THEN** the page shows an empty-state message pointing to the create row
-
-### Requirement: Canvas picker breadcrumb returns to workspaces
-
-The canvas picker's top bar SHALL show a breadcrumb of the app name followed by the current workspace name. Activating the app name SHALL return to the workspace list. The page SHALL NOT show a separate "Switch workspace" footer button. A long workspace name SHALL end with an ellipsis rather than push the top bar's other controls out of view.
-
-#### Scenario: Go back to workspaces
-
-- **WHEN** the user activates the app name in the canvas picker's breadcrumb
-- **THEN** the workspace list is shown
-
-#### Scenario: Long workspace name
-
-- **WHEN** the workspace name is longer than the top bar can fit
-- **THEN** the name ends with an ellipsis and the Settings control stays visible
-
-### Requirement: Canvas picker focuses the title field
-
-When the canvas picker appears, keyboard focus SHALL start in the canvas title field so the user can type a name and press Enter to create a canvas.
-
-#### Scenario: Create a canvas from the keyboard
-
-- **WHEN** the canvas picker appears and the user types "Launch plan" and presses Enter
-- **THEN** a canvas titled "Launch plan" is created and opened
+- **WHEN** there are no saved workspaces
+- **THEN** the map shows an empty-state message pointing to the create-workspace row
 
 ### Requirement: Persistent activity rail on the canvas
 

@@ -139,8 +139,7 @@
     validateProvider,
   } from "./lib/provider";
   import { transcribeSpeech } from "./lib/speech";
-  import WorkspacePicker from "./lib/components/WorkspacePicker.svelte";
-  import CanvasPicker from "./lib/components/CanvasPicker.svelte";
+  import BranchingPicker from "./lib/components/BranchingPicker.svelte";
   import NodeDrawer from "./lib/components/NodeDrawer.svelte";
   import Inspector from "./lib/components/Inspector.svelte";
   import {
@@ -2503,6 +2502,16 @@
     }
   }
   async function deleteScope(workspaceId: string, canvasId?: string) {
+    // Delete from the branch map, where the open workspace can be the target.
+    // Close it first so the runtime releases its lock and no stale canvases
+    // stay on screen behind an id the runtime no longer knows.
+    if (
+      canvasId === undefined &&
+      editorState.workspace?.workspace.id === workspaceId
+    ) {
+      await backToWorkspaces();
+      if (editorState.workspace?.workspace.id === workspaceId) return;
+    }
     const deleted =
       canvasId === undefined
         ? await editor.deleteWorkspace(workspaceId)
@@ -3267,24 +3276,42 @@
   {#if desktopMode}
     <TitleBar {accent} onAccentChange={(next) => (accent = next)} />
   {/if}
-  {#if stage === "workspace"}
-    <WorkspacePicker
+  {#if stage !== "editor"}
+    <BranchingPicker
       workspaces={editorState.workspaces}
+      open={editorState.workspace
+        ? {
+            id: editorState.workspace.workspace.id,
+            name: editorState.workspace.workspace.name ?? "Unnamed workspace",
+            canvases: editorState.workspace.canvases,
+          }
+        : null}
       {connected}
       connection={connectionControls}
       {reconnecting}
       onReconnect={() => void reconnect()}
-      {busy}
+      busy={working}
       error={editorState.error}
       onRefresh={() => void editor.listWorkspaces()}
-      onCreate={(name) => void editor.createWorkspace(name)}
-      onOpen={(id) => void editor.openWorkspace(id)}
-      onDelete={(id) =>
+      onCreateWorkspace={(name) => void editor.createWorkspace(name)}
+      onOpenWorkspace={(id) => void editor.openWorkspace(id)}
+      onCollapse={() => void backToWorkspaces()}
+      onCreateCanvas={(title) => void editor.createCanvas(title)}
+      onOpenCanvas={(id) => void editor.openCanvas(id)}
+      onDeleteWorkspace={(id) =>
         void requestRemoval(
           id,
           undefined,
           editorState.workspaces.find((w) => w.id === id)?.name ?? "Workspace",
           () => deleteScope(id),
+        )}
+      onDeleteCanvas={(id) =>
+        void requestRemoval(
+          editorState.workspace!.workspace.id,
+          id,
+          editorState.workspace?.canvases.find((c) => c.id === id)?.title ??
+            "Canvas",
+          () => deleteScope(editorState.workspace!.workspace.id, id),
         )}
       backups={desktopMode}
       onBackup={(id) =>
@@ -3296,27 +3323,6 @@
               "workspace",
           }),
         )}
-      onOpenSettings={() => (settingsOpen = true)}
-    />
-  {:else if stage === "canvas"}
-    <CanvasPicker
-      workspaceName={editorState.workspace?.workspace.name ??
-        "Unnamed workspace"}
-      canvases={editorState.workspace?.canvases ?? []}
-      connection={connectionControls}
-      busy={working}
-      error={editorState.error}
-      onCreate={(title) => void editor.createCanvas(title)}
-      onOpen={(id) => void editor.openCanvas(id)}
-      onDelete={(id) =>
-        void requestRemoval(
-          editorState.workspace!.workspace.id,
-          id,
-          editorState.workspace?.canvases.find((c) => c.id === id)?.title ??
-            "Canvas",
-          () => deleteScope(editorState.workspace!.workspace.id, id),
-        )}
-      onBack={() => void backToWorkspaces()}
       onOpenSettings={() => (settingsOpen = true)}
     />
   {:else}
