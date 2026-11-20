@@ -2,6 +2,7 @@
   import { LIMITS } from "@agentica/protocol";
   import { tick, type Snippet } from "svelte";
   import Icon from "./Icon.svelte";
+  import Logomark from "./Logomark.svelte";
 
   interface WorkspaceInfo {
     id: string;
@@ -123,7 +124,7 @@
 <div class="home">
   <header class="home__bar">
     <span class="home__brand">
-      <span class="home__logo"><Icon name="blur_on" size={18} /></span>
+      <Logomark class="home__logo" />
       Agentica
     </span>
     <span class="home__tools">

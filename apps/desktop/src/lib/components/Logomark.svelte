@@ -1,0 +1,188 @@
+<script lang="ts">
+  interface Props {
+    /** Rendered width and height in pixels; CSS may size it instead. */
+    size?: number;
+    class?: string;
+  }
+
+  let { size = 35, class: className = "" }: Props = $props();
+  // Inline gradients need per-instance ids so several marks can share a page.
+  const uid = $props.id();
+</script>
+
+<svg
+  class={className}
+  viewBox="0 0 256 256"
+  width={size}
+  height={size}
+  role="img"
+  aria-label="Agentica"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient id={`${uid}-badge`} x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#cdc0ff" />
+      <stop offset="0.55" stop-color="#9b8af8" />
+      <stop offset="1" stop-color="#7c68f0" />
+    </linearGradient>
+    <linearGradient id={`${uid}-gloss`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.5" />
+      <stop offset="0.62" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id={`${uid}-head`} x1="0.15" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#e6e0ff" />
+    </linearGradient>
+    <linearGradient id={`${uid}-visor`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f5ae8" />
+      <stop offset="1" stop-color="#3f2fa6" />
+    </linearGradient>
+    <linearGradient id={`${uid}-ear`} x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b7a8ff" />
+      <stop offset="1" stop-color="#7c68f0" />
+    </linearGradient>
+    <filter id={`${uid}-soft`} x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow
+        dx="0"
+        dy="8"
+        stdDeviation="8"
+        flood-color="#4a3896"
+        flood-opacity="0.35"
+      />
+    </filter>
+    <filter id={`${uid}-glow`} x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Clay badge: light top-lit gradient, inner highlight and soft base shadow. -->
+  <rect
+    x="6"
+    y="6"
+    width="244"
+    height="244"
+    rx="72"
+    fill={`url(#${uid}-badge)`}
+  />
+  <rect
+    x="6"
+    y="6"
+    width="244"
+    height="244"
+    rx="72"
+    fill={`url(#${uid}-gloss)`}
+  />
+  <rect
+    x="14"
+    y="14"
+    width="228"
+    height="228"
+    rx="64"
+    fill="none"
+    stroke="#ffffff"
+    stroke-opacity="0.35"
+    stroke-width="3"
+  />
+
+  <!-- Antenna -->
+  <g filter={`url(#${uid}-soft)`}>
+    <rect x="123" y="50" width="10" height="32" rx="5" fill="#e9e3ff" />
+    <circle cx="128" cy="44" r="14" fill={`url(#${uid}-ear)`} />
+    <circle cx="123" cy="39" r="4.5" fill="#ffffff" fill-opacity="0.72" />
+  </g>
+
+  <!-- Ear pods -->
+  <rect
+    x="34"
+    y="106"
+    width="26"
+    height="58"
+    rx="13"
+    fill={`url(#${uid}-ear)`}
+  />
+  <rect
+    x="196"
+    y="106"
+    width="26"
+    height="58"
+    rx="13"
+    fill={`url(#${uid}-ear)`}
+  />
+
+  <!-- Puffy head, visor and glowing eyes. The eyes follow the accent palette. -->
+  <g filter={`url(#${uid}-soft)`}>
+    <rect
+      x="52"
+      y="78"
+      width="152"
+      height="124"
+      rx="46"
+      fill={`url(#${uid}-head)`}
+    />
+    <rect
+      x="60"
+      y="86"
+      width="136"
+      height="108"
+      rx="38"
+      fill="none"
+      stroke="#ffffff"
+      stroke-opacity="0.8"
+      stroke-width="2"
+    />
+
+    <rect
+      x="74"
+      y="102"
+      width="108"
+      height="66"
+      rx="30"
+      fill={`url(#${uid}-visor)`}
+    />
+    <rect
+      x="74"
+      y="102"
+      width="108"
+      height="66"
+      rx="30"
+      fill="none"
+      stroke="#2f2382"
+      stroke-opacity="0.55"
+      stroke-width="2"
+    />
+    <path
+      d="M92 112h72"
+      stroke="#ffffff"
+      stroke-opacity="0.22"
+      stroke-width="4"
+      stroke-linecap="round"
+    />
+
+    <g filter={`url(#${uid}-glow)`}>
+      <rect
+        x="96"
+        y="122"
+        width="16"
+        height="24"
+        rx="8"
+        fill="var(--logo-eye, #a9f5e0)"
+      />
+      <rect
+        x="144"
+        y="122"
+        width="16"
+        height="24"
+        rx="8"
+        fill="var(--logo-eye, #a9f5e0)"
+      />
+    </g>
+
+    <circle cx="112" cy="184" r="4" fill="#cfc6f7" />
+    <circle cx="128" cy="184" r="4" fill="#cfc6f7" />
+    <circle cx="144" cy="184" r="4" fill="#cfc6f7" />
+  </g>
+</svg>

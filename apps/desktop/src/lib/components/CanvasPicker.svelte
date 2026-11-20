@@ -2,6 +2,7 @@
   import { LIMITS } from "@agentica/protocol";
   import { tick, type Snippet } from "svelte";
   import Icon from "./Icon.svelte";
+  import Logomark from "./Logomark.svelte";
 
   interface CanvasInfo {
     id: string;
@@ -97,7 +98,7 @@
         disabled={busy}
         onclick={onBack}
       >
-        <span class="home__logo"><Icon name="blur_on" size={18} /></span>
+        <Logomark class="home__logo" />
         Agentica
       </button>
       <span class="home__sep" aria-hidden="true">/</span>

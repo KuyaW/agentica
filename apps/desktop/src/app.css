@@ -57,6 +57,8 @@
   --blob-1: #cbbcff;
   --blob-2: #a9e6d8;
   --blob-3: #ffd9bd;
+  /* The robot's eyes glow in the selected accent palette. */
+  --logo-eye: color-mix(in oklab, var(--accent) 45%, #ffffff);
   --surface-glass: rgba(252, 251, 255, 0.78);
   --surface-edge: rgba(255, 255, 255, 0.72);
   --scrim: rgba(54, 43, 96, 0.34);
@@ -962,24 +964,13 @@ button.home__brand:disabled {
   white-space: nowrap;
   font-weight: 600;
   color: var(--ink-soft);
-}
-
+} /* Logomark draws its own clay badge, highlights and shadow; only size it here. */
 .home__logo {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 2.2rem;
   height: 2.2rem;
-  border-radius: 14px;
-  color: var(--on-primary);
-  background: linear-gradient(
-    150deg,
-    var(--accent) 0%,
-    var(--accent-strong) 100%
-  );
-  box-shadow:
-    0 10px 18px -10px color-mix(in srgb, var(--accent) 62%, transparent),
-    inset 0 -3px 6px rgba(60, 40, 140, 0.28),
-    inset 0 3px 6px rgba(255, 255, 255, 0.45);
+  flex: none;
+  filter: drop-shadow(0 8px 14px rgba(74, 56, 150, 0.28));
 }
 
 .home__tools {
@@ -1424,6 +1415,51 @@ button.home__brand:disabled {
   background: var(--line);
 }
 
+/* Compact palette switch: five clay dots that repaint the app on click. */
+.accent-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.22rem 0.3rem;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-inset);
+}
+
+.accent-dot {
+  width: 1.05rem;
+  height: 1.05rem;
+  padding: 0;
+  flex: none;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow:
+    inset 0 -2px 3px rgba(60, 40, 140, 0.28),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition:
+    transform 0.22s var(--spring),
+    box-shadow 0.18s ease;
+}
+
+.accent-dot:hover {
+  transform: translateY(-1px) scale(1.12);
+}
+
+.accent-dot[aria-pressed="true"] {
+  border-color: var(--surface-solid);
+  box-shadow:
+    0 0 0 2px var(--accent),
+    inset 0 -2px 3px rgba(60, 40, 140, 0.28),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5);
+}
+
+.accent-dot:focus-visible {
+  outline-offset: 2px;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -1432,23 +1468,12 @@ button.home__brand:disabled {
   font-weight: 600;
   letter-spacing: -0.01em;
 }
-
 .brand__mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 2.2rem;
   height: 2.2rem;
-  color: #fff;
-  border-radius: 14px;
-  background: linear-gradient(
-    150deg,
-    var(--accent) 0%,
-    var(--accent-strong) 100%
-  );
-  box-shadow:
-    0 12px 22px -12px color-mix(in srgb, var(--accent) 62%, transparent),
-    inset 0 -4px 8px rgba(60, 40, 140, 0.26),
-    inset 0 4px 8px rgba(255, 255, 255, 0.45);
+  flex: none;
+  filter: drop-shadow(0 8px 14px rgba(74, 56, 150, 0.28));
 }
 
 .crumbs {

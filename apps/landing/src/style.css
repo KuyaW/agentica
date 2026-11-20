@@ -358,25 +358,15 @@ code {
 }
 
 .brand__mark {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  filter: drop-shadow(0 4px 8px rgba(30, 20, 70, 0.22));
 }
 
-.brand__mark rect {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-}
-
-.brand__mark path {
-  fill: none;
-  stroke: var(--primary);
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-.brand__mark circle {
-  fill: var(--primary);
+/* The robot's eyes take the page accent in both themes. */
+.brand__mark .logo-eye {
+  fill: color-mix(in oklab, var(--primary) 45%, #ffffff);
 }
 
 .nav__links {

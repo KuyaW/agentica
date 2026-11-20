@@ -63,12 +63,194 @@
     <header class="nav">
       <div class="wrap nav__inner">
         <a class="brand" href="#hero" aria-label="Agentica home">
-          <svg class="brand__mark" viewBox="0 0 28 28" aria-hidden="true">
-            <rect x="1" y="1" width="26" height="26" rx="7" />
-            <path d="M9 9h10M9 9l5 10" />
-            <circle cx="9" cy="9" r="2.1" />
-            <circle cx="19" cy="9" r="2.1" />
-            <circle cx="14" cy="19" r="2.1" />
+          <svg class="brand__mark" viewBox="0 0 256 256" aria-hidden="true">
+            <defs>
+              <linearGradient id="brand-badge" x1="0.2" y1="0" x2="0.8" y2="1">
+                <stop offset="0" stop-color="#cdc0ff" />
+                <stop offset="0.55" stop-color="#9b8af8" />
+                <stop offset="1" stop-color="#7c68f0" />
+              </linearGradient>
+              <linearGradient id="brand-gloss" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.5" />
+                <stop offset="0.62" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="brand-head" x1="0.15" y1="0" x2="0.4" y2="1">
+                <stop offset="0" stop-color="#ffffff" />
+                <stop offset="1" stop-color="#e6e0ff" />
+              </linearGradient>
+              <linearGradient id="brand-visor" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#6f5ae8" />
+                <stop offset="1" stop-color="#3f2fa6" />
+              </linearGradient>
+              <linearGradient id="brand-ear" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#b7a8ff" />
+                <stop offset="1" stop-color="#7c68f0" />
+              </linearGradient>
+              <filter
+                id="brand-soft"
+                x="-30%"
+                y="-30%"
+                width="160%"
+                height="160%"
+              >
+                <feDropShadow
+                  dx="0"
+                  dy="8"
+                  stdDeviation="8"
+                  flood-color="#4a3896"
+                  flood-opacity="0.35"
+                />
+              </filter>
+              <filter
+                id="brand-glow"
+                x="-80%"
+                y="-80%"
+                width="260%"
+                height="260%"
+              >
+                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <rect
+              x="6"
+              y="6"
+              width="244"
+              height="244"
+              rx="72"
+              fill="url(#brand-badge)"
+            />
+            <rect
+              x="6"
+              y="6"
+              width="244"
+              height="244"
+              rx="72"
+              fill="url(#brand-gloss)"
+            />
+            <rect
+              x="14"
+              y="14"
+              width="228"
+              height="228"
+              rx="64"
+              fill="none"
+              stroke="#ffffff"
+              stroke-opacity="0.35"
+              stroke-width="3"
+            />
+
+            <g filter="url(#brand-soft)">
+              <rect
+                x="123"
+                y="50"
+                width="10"
+                height="32"
+                rx="5"
+                fill="#e9e3ff"
+              />
+              <circle cx="128" cy="44" r="14" fill="url(#brand-ear)" />
+              <circle
+                cx="123"
+                cy="39"
+                r="4.5"
+                fill="#ffffff"
+                fill-opacity="0.72"
+              />
+            </g>
+
+            <rect
+              x="34"
+              y="106"
+              width="26"
+              height="58"
+              rx="13"
+              fill="url(#brand-ear)"
+            />
+            <rect
+              x="196"
+              y="106"
+              width="26"
+              height="58"
+              rx="13"
+              fill="url(#brand-ear)"
+            />
+
+            <g filter="url(#brand-soft)">
+              <rect
+                x="52"
+                y="78"
+                width="152"
+                height="124"
+                rx="46"
+                fill="url(#brand-head)"
+              />
+              <rect
+                x="60"
+                y="86"
+                width="136"
+                height="108"
+                rx="38"
+                fill="none"
+                stroke="#ffffff"
+                stroke-opacity="0.8"
+                stroke-width="2"
+              />
+
+              <rect
+                x="74"
+                y="102"
+                width="108"
+                height="66"
+                rx="30"
+                fill="url(#brand-visor)"
+              />
+              <rect
+                x="74"
+                y="102"
+                width="108"
+                height="66"
+                rx="30"
+                fill="none"
+                stroke="#2f2382"
+                stroke-opacity="0.55"
+                stroke-width="2"
+              />
+              <path
+                d="M92 112h72"
+                stroke="#ffffff"
+                stroke-opacity="0.22"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+
+              <g filter="url(#brand-glow)">
+                <rect
+                  class="logo-eye"
+                  x="96"
+                  y="122"
+                  width="16"
+                  height="24"
+                  rx="8"
+                />
+                <rect
+                  class="logo-eye"
+                  x="144"
+                  y="122"
+                  width="16"
+                  height="24"
+                  rx="8"
+                />
+              </g>
+
+              <circle cx="112" cy="184" r="4" fill="#cfc6f7" />
+              <circle cx="128" cy="184" r="4" fill="#cfc6f7" />
+              <circle cx="144" cy="184" r="4" fill="#cfc6f7" />
+            </g>
           </svg>
           <span class="brand__word">agentica</span>
         </a>
