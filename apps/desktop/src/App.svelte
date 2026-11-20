@@ -592,9 +592,6 @@
     editorState.workspace?.workspace.name ?? "Workspace",
   );
   const canvasTitle = $derived(editorState.document?.canvas.title ?? "Canvas");
-  const canSave = $derived(
-    connected && !working && editorState.dirty && !editorState.error,
-  );
   const selected = $derived(
     editorState.document?.nodes.find((node) => node.id === selectedId),
   );
@@ -3416,14 +3413,6 @@
             <span class="pill pill--bad"
               ><span class="pill__dot"></span>Operation failed</span
             >
-          {:else if canSave}
-            <button
-              class="btn btn--primary"
-              type="button"
-              onclick={() => void editor.save()}
-            >
-              <Icon name="save" size={18} />Save now
-            </button>
           {:else if editorState.dirty}
             <span class="pill pill--warn"
               ><span class="pill__dot"></span>Unsaved changes</span

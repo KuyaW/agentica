@@ -36,7 +36,7 @@ The canvas top bar SHALL keep each button label and status label on a single lin
 - **THEN** the save status control is fully visible in the top bar
 - **AND** the canvas gallery and open-project action are fully visible in the top bar for Classic or in the rail for Activity bar
 - **AND** Settings is visible in the top bar for Classic or at the bottom of the rail for Activity bar
-- **AND** the user can save unsaved edits from the top bar
+- **AND** unsaved edits still save automatically without a manual action
 
 #### Scenario: Collapsed action keeps its name
 
@@ -108,7 +108,7 @@ The runtime's workspace list SHALL report, for each workspace, the number of can
 
 ### Requirement: Single save status control
 
-The canvas top bar SHALL present saving as one control that shows the current state, never a separate status label plus a disabled Save button. At rest it SHALL read "Saved" and SHALL NOT look like an enabled primary action. While a save is running it SHALL read "Saving…". When there are unsaved edits and a save can start, it SHALL be an enabled "Save now" action that saves immediately. When there are unsaved edits but a save cannot start, for example while disconnected or while another operation runs, it SHALL read "Unsaved changes" as a status rather than show a disabled action. After a save fails with edits still unsaved, it SHALL be a "Retry save" action in an error style, enabled whenever a retry can start. When a non-save operation fails with nothing unsaved, it SHALL show that failure as an error status, and the existing error banner keeps its recovery actions. The control's state SHALL be announced to assistive technology.
+The canvas top bar SHALL present saving as one status control that shows the current state, never a separate status label plus a Save button. Saving SHALL be automatic, so the control SHALL NOT offer a manual save action. At rest it SHALL read "Saved" and SHALL NOT look like an enabled action. While a save is running it SHALL read "Saving…". When there are unsaved edits, including while a save cannot start because the client is disconnected or another operation runs, it SHALL read "Unsaved changes" as a status rather than show a disabled action. After a save fails with edits still unsaved, it SHALL be a "Retry save" action in an error style, enabled whenever a retry can start. When a non-save operation fails with nothing unsaved, it SHALL show that failure as an error status, and the existing error banner keeps its recovery actions. The control's state SHALL be announced to assistive technology.
 
 #### Scenario: Idle after autosave
 
@@ -118,7 +118,7 @@ The canvas top bar SHALL present saving as one control that shows the current st
 #### Scenario: Unsaved edits
 
 - **WHEN** the user has edits that have not been saved yet
-- **THEN** the control reads "Save now" and activating it saves the canvas
+- **THEN** the control reads "Unsaved changes" while autosave catches up, then "Saved", with no manual save step
 
 #### Scenario: Unsaved edits while disconnected
 
