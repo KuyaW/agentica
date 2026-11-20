@@ -1,6 +1,6 @@
 <script lang="ts">
   import { LIMITS } from "@agentica/protocol";
-  import { tick, type Snippet } from "svelte";
+  import { onDestroy, tick, untrack, type Snippet } from "svelte";
   import { cubicOut } from "svelte/easing";
   import { fade, fly, scale } from "svelte/transition";
   import Icon from "./Icon.svelte";
@@ -14,6 +14,7 @@
     layoutBranch,
     type BranchNode,
     type LaidOutNode,
+    type Transform,
   } from "../branching";
 
   interface WorkspaceInfo {
@@ -270,6 +271,38 @@
   let transform = $state({ x: 0, y: 0, k: 1 });
   let panning = $state(false);
   let panStart: { x: number; y: number; tx: number; ty: number } | null = null;
+  // The frame of a camera glide in flight, so a new framing or a pan can take
+  // over from it.
+  let cameraFrame = 0;
+
+  function stopCamera() {
+    cancelAnimationFrame(cameraFrame);
+  }
+
+  onDestroy(stopCamera);
+
+  /** Glide the camera to a framing instead of snapping the view there. */
+  function glideTo(next: Transform, duration = 340) {
+    stopCamera();
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      transform = next;
+      return;
+    }
+    const from = { ...transform };
+    const started = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - started) / duration);
+      // Ease out, so the branch settles rather than stopping dead.
+      const eased = 1 - (1 - t) ** 3;
+      transform = {
+        k: from.k + (next.k - from.k) * eased,
+        x: from.x + (next.x - from.x) * eased,
+        y: from.y + (next.y - from.y) * eased,
+      };
+      if (t < 1) cameraFrame = requestAnimationFrame(step);
+    };
+    cameraFrame = requestAnimationFrame(step);
+  }
 
   // The layout only changes when a branch or a card is added, removed or
   // renamed, so the camera reframes then and leaves a rolled canvas alone.
@@ -277,13 +310,58 @@
     `${workspaces.map((workspace) => `${workspace.id}:${workspace.name}:${workspace.canvases}`).join(",")}|${open?.id ?? ""}:${open?.canvases.map((canvas) => `${canvas.id}:${canvas.title}`).join(",")}`,
   );
 
+  /** One workspace card and the canvases unfolded beneath it. */
+  function branchBounds(workspaceId: string) {
+    const branch = workspaceKey(workspaceId);
+    const nodes = Array.from(layout.values()).filter(
+      (node) => node.id === branch || node.parentId === branch,
+    );
+    if (nodes.length === 0) return null;
+    return layoutBounds(new Map(nodes.map((node) => [node.id, node])));
+  }
+
+  // Unfolding a branch glides to it, so the new canvases land in view; folding
+  // it back opens out to the whole map. Anything else keeps the tree fitted
+  // where it stands.
+  let shownBranch: string | null = null;
+  let framed = false;
+
   $effect(() => {
     void layoutKey;
-    const bounds = layoutBounds(layout);
     if (!mapWidth || !mapHeight) return;
-    transform = fitTransform(bounds, {
-      width: mapWidth,
-      height: mapHeight,
+    const viewport = { width: mapWidth, height: mapHeight };
+    const openId = open?.id ?? null;
+    const changed = openId !== shownBranch;
+    shownBranch = openId;
+
+    if (!framed) {
+      framed = true;
+      transform = fitTransform(layoutBounds(layout), viewport);
+      return;
+    }
+
+    if (!changed) {
+      stopCamera();
+      transform = fitTransform(layoutBounds(layout), viewport);
+      return;
+    }
+
+    const bounds = openId ? branchBounds(openId) : null;
+    if (!bounds) {
+      glideTo(fitTransform(layoutBounds(layout), viewport));
+      return;
+    }
+
+    const fit = fitTransform(bounds, viewport, 90);
+    // Pan to the branch without zooming in past the user's own scale.
+    const k = Math.min(
+      untrack(() => transform.k),
+      fit.k,
+    );
+    glideTo({
+      k,
+      x: mapWidth / 2 - ((bounds.min.x + bounds.max.x) / 2) * k,
+      y: mapHeight / 2 - ((bounds.min.y + bounds.max.y) / 2) * k,
     });
   });
 
@@ -297,6 +375,7 @@
       )
     )
       return;
+    stopCamera();
     panning = true;
     panStart = {
       x: event.clientX,
@@ -326,6 +405,7 @@
   }
 
   function zoomAt(factor: number, px: number, py: number) {
+    stopCamera();
     const k = Math.min(1.6, Math.max(0.2, transform.k * factor));
     const ratio = k / transform.k;
     transform = {
@@ -340,6 +420,7 @@
   }
 
   function fit() {
+    stopCamera();
     transform = fitTransform(layoutBounds(layout), {
       width: mapWidth,
       height: mapHeight,
@@ -361,6 +442,7 @@
   function reveal(key: string) {
     const node = layout.get(key);
     if (!node || !mapWidth || !mapHeight) return;
+    stopCamera();
     const k = Math.max(transform.k, 0.9);
     transform = {
       k,
