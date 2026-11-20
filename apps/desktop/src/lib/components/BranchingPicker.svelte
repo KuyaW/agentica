@@ -1145,9 +1145,10 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
+    /* The softer line token: the grid reads as texture, not as a pattern. */
     background-image: radial-gradient(
       circle,
-      var(--line-strong) 1.2px,
+      var(--line) 1.2px,
       transparent 1.2px
     );
     background-size: 26px 26px;
