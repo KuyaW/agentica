@@ -114,6 +114,19 @@
     addButton?.focus();
   }
 
+  /**
+   * Focus leaving the field ends the naming and the panel returns to its Add
+   * workspace button. Focus is left where the user put it; switching windows
+   * blurs the form too, so the typed name survives a trip to another app.
+   */
+  function leaveNaming(event: FocusEvent) {
+    const next = event.relatedTarget;
+    if (next instanceof Node && (event.currentTarget as Element).contains(next))
+      return;
+    if (!document.hasFocus()) return;
+    naming = false;
+  }
+
   async function submitWorkspace() {
     onCreateWorkspace(name.trim());
     name = "";
@@ -491,7 +504,7 @@
         style:background-position={`${transform.x}px ${transform.y}px`}
       ></div>
 
-      <div class="map__create">
+      <div class="map__create" class:map__create--slim={!open && !naming}>
         <!-- An open workspace is the job at hand, so its own creation is out of
              the way and only the canvas form stays. -->
         {#if !open && naming}
@@ -502,6 +515,7 @@
               event.preventDefault();
               void submitWorkspace();
             }}
+            onfocusout={leaveNaming}
           >
             <label class="sr-only" for="workspace-name">Workspace name</label>
             <input
@@ -1070,8 +1084,10 @@
     border-radius: 11px;
   }
 
-  .create__add {
-    width: 100%;
+  /* With only the Add workspace button inside, the panel hugs it instead of
+     leaving a stretched pill across the width the forms need. */
+  .map__create--slim {
+    width: auto;
   }
 
   .map__note,
