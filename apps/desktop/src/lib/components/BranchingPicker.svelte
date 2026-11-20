@@ -2,7 +2,7 @@
   import { LIMITS } from "@agentica/protocol";
   import { onDestroy, tick, untrack, type Snippet } from "svelte";
   import { cubicOut } from "svelte/easing";
-  import { fade, fly, scale } from "svelte/transition";
+  import { fade, fly, type TransitionConfig } from "svelte/transition";
   import Icon from "./Icon.svelte";
   import Logomark from "./Logomark.svelte";
   import {
@@ -80,20 +80,76 @@
     onOpenSettings,
   }: Props = $props();
 
-  // A card swells out of the branch it joins and shrinks back into it on the
-  // way out. The global reduced-motion rule in app.css shortens both.
-  const growIn = () => ({
-    start: 0.9,
-    opacity: 0,
-    duration: 200,
-    easing: cubicOut,
-  });
-  const growOut = () => ({
-    start: 0.9,
-    opacity: 0,
-    duration: 140,
-    easing: cubicOut,
-  });
+  /** Beat between two siblings starting their fold. */
+  const FOLD_STAGGER = 90;
+  /** Most siblings that delay each other, so a wide branch stays brisk. */
+  const FOLD_STAGGER_MAX = 4;
+  /** How long a card takes to fly back into its parent. */
+  const FOLD_OUT = 200;
+
+  /**
+   * Milliseconds a card waits before it folds: its siblings go in turn, and it
+   * waits for the children folding into it, so parents fold last.
+   */
+  function foldWait(all: readonly { node: LaidOutNode }[], id: string): number {
+    const card = all.find((item) => item.node.id === id);
+    if (!card) return 0;
+    const siblings = all.filter(
+      (item) => item.node.parentId === card.node.parentId,
+    );
+    const order = siblings.findIndex((item) => item.node.id === id);
+    const children = all.filter((item) => item.node.parentId === id);
+    const childWait =
+      children.length > 0
+        ? Math.max(...children.map((child) => foldWait(all, child.node.id))) +
+          FOLD_OUT
+        : 0;
+    return (
+      Math.min(Math.max(order, 0), FOLD_STAGGER_MAX) * FOLD_STAGGER + childWait
+    );
+  }
+
+  /**
+   * Milliseconds a card waits before it unfolds: siblings come out one after
+   * another, so a branch opens in order instead of popping out at once.
+   */
+  function unfoldWait(
+    all: readonly { node: LaidOutNode }[],
+    id: string,
+  ): number {
+    const card = all.find((item) => item.node.id === id);
+    if (!card) return 0;
+    const siblings = all.filter(
+      (item) => item.node.parentId === card.node.parentId,
+    );
+    const order = siblings.findIndex((item) => item.node.id === id);
+    return Math.min(Math.max(order, 0), FOLD_STAGGER_MAX) * FOLD_STAGGER;
+  }
+
+  /**
+   * An unfolding card grows out of the card it hangs from, and a folding one
+   * shrinks back into it. `from` is that card's offset, so the same tween runs
+   * forwards for the intro and backwards for the outro.
+   */
+  function foldCard(
+    _node: Element,
+    {
+      from,
+      delay = 0,
+      duration = 260,
+    }: { from: { x: number; y: number }; delay?: number; duration?: number },
+  ): TransitionConfig {
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return {
+      delay: reduced ? 0 : delay,
+      duration: reduced ? 0 : duration,
+      easing: cubicOut,
+      css: (t) =>
+        `opacity: ${t}; transform: translate(${from.x * (1 - t)}px, ${
+          from.y * (1 - t)
+        }px) scale(${0.62 + 0.38 * t});`,
+    };
+  }
 
   let name = $state("");
   let title = $state("");
@@ -262,6 +318,16 @@
       ];
     }),
   );
+
+  // The cards as the last painted frame had them. By the time a card folds,
+  // `cards` no longer lists it or its siblings and children, so the fold order
+  // has to read the frame that still had them. Deliberately not reactive: the
+  // outro is built during the update that removes the cards, before this is
+  // refreshed.
+  const lastFrame = { cards: [] as readonly { node: LaidOutNode }[] };
+  $effect(() => {
+    lastFrame.cards = cards;
+  });
 
   /* ----------------------------------------------------- camera and pan */
 
@@ -703,6 +769,15 @@
 
           {#each cards as card (card.node.id)}
             {@const workspaceId = card.info.workspaceId}
+            {@const parent = card.node.parentId
+              ? layout.get(card.node.parentId)
+              : null}
+            {@const fold = parent
+              ? {
+                  x: parent.pos.x - card.node.pos.x,
+                  y: parent.pos.y - card.node.pos.y,
+                }
+              : { x: 0, y: 0 }}
             <div
               class="map__node"
               style:transform={`translate3d(${card.node.pos.x}px, ${card.node.pos.y}px, 0)`}
@@ -710,8 +785,16 @@
               {#if card.info.kind === "root"}
                 <div
                   class="card card--root"
-                  in:scale={growIn()}
-                  out:scale={growOut()}
+                  in:foldCard={{
+                    from: fold,
+                    delay: unfoldWait(cards, card.node.id),
+                    duration: 280,
+                  }}
+                  out:foldCard={{
+                    from: fold,
+                    delay: foldWait(lastFrame.cards, card.node.id),
+                    duration: FOLD_OUT,
+                  }}
                 >
                   <button
                     class="card__open"
@@ -735,8 +818,16 @@
                 <div
                   class="card"
                   class:card--open={expanded}
-                  in:scale={growIn()}
-                  out:scale={growOut()}
+                  in:foldCard={{
+                    from: fold,
+                    delay: unfoldWait(cards, card.node.id),
+                    duration: 280,
+                  }}
+                  out:foldCard={{
+                    from: fold,
+                    delay: foldWait(lastFrame.cards, card.node.id),
+                    duration: FOLD_OUT,
+                  }}
                 >
                   <button
                     class="card__open"
@@ -829,7 +920,19 @@
                   card.node.id.slice("canvas:".length),
                 )}
                 {@const canvasId = card.node.id.slice("canvas:".length)}
-                <div class="card" in:scale={growIn()} out:scale={growOut()}>
+                <div
+                  class="card"
+                  in:foldCard={{
+                    from: fold,
+                    delay: unfoldWait(cards, card.node.id),
+                    duration: 280,
+                  }}
+                  out:foldCard={{
+                    from: fold,
+                    delay: foldWait(lastFrame.cards, card.node.id),
+                    duration: FOLD_OUT,
+                  }}
+                >
                   <button
                     class="card__open"
                     type="button"
