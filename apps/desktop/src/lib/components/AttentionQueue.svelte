@@ -306,11 +306,11 @@
     max-height: min(480px, 70vh);
     overflow: auto;
     box-sizing: border-box;
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--radius);
     background: var(--surface);
     color: var(--ink);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-lg);
   }
   header {
     display: flex;
@@ -352,7 +352,7 @@
     row-gap: 4px;
     align-items: baseline;
     padding: 10px;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 13px;
   }
   .row + .row {

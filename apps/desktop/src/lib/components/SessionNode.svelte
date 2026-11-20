@@ -333,17 +333,18 @@ notification_condition = "always"`}</code
     display: flex;
     flex-direction: column;
     border: 1px solid var(--line-strong);
-    border-radius: 10px;
+    border-radius: var(--radius);
     overflow: hidden;
     background: var(--surface);
     color: var(--ink);
     box-shadow: var(--shadow-sm);
   }
   .session-drag {
-    padding: 8px 10px;
+    padding: 10px 12px 9px;
     cursor: grab;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line-strong);
+    background: var(--surface-header);
+    border-bottom: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 var(--surface-edge);
     flex: none;
   }
   .session-title {
@@ -387,11 +388,20 @@ notification_condition = "always"`}</code
     width: 28px;
     height: 28px;
   }
+  /* A recessed clay well around the terminal, so the dark screen sits inside
+     the tile rather than flush with its edges. */
   .terminal-body {
     flex: 1;
     min-height: 0;
-    padding: 8px;
+    margin: 8px;
+    padding: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.55);
+    border-radius: 14px;
     background: #0d1117;
+    box-shadow:
+      inset 0 5px 14px rgba(0, 0, 0, 0.7),
+      inset 0 -2px 6px rgba(255, 255, 255, 0.05),
+      0 3px 10px -4px rgba(60, 44, 130, 0.45);
     overflow: hidden;
   }
   .terminal-body:focus-within {
@@ -507,11 +517,12 @@ notification_condition = "always"`}</code
     border-top-color: var(--line-strong);
   }
   footer {
-    padding: 4px 10px;
+    padding: 5px 12px;
     font-size: 11px;
     line-height: 16px;
     color: var(--ink-soft);
-    background: var(--surface);
+    background: var(--surface-soft);
+    border-top: 1px solid var(--line);
     flex: none;
   }
   .resize-grip {

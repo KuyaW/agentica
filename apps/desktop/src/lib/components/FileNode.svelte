@@ -271,7 +271,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: 14px;
+    border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--surface);
     box-shadow: var(--shadow-sm);
@@ -283,6 +283,10 @@
   .file__head {
     flex: none;
     min-width: 0;
+    padding: 7px 12px;
+    background: var(--surface-header);
+    border-bottom: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 var(--surface-edge);
   }
   .file__name {
     overflow: hidden;
@@ -303,7 +307,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: color-mix(in srgb, var(--surface) 82%, var(--bg));
+    background: color-mix(in srgb, var(--surface-solid) 82%, var(--bg));
   }
   .file__image {
     width: 100%;
@@ -326,7 +330,7 @@
     gap: 4px;
     padding: 2px 8px;
     border-radius: 999px;
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    background: color-mix(in srgb, var(--surface-solid) 88%, transparent);
     border: 1px solid var(--border);
     font-size: 11px;
   }
@@ -375,6 +379,6 @@
     display: none;
   }
   .file--bare .file__head {
-    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    background: color-mix(in srgb, var(--surface-solid) 92%, transparent);
   }
 </style>

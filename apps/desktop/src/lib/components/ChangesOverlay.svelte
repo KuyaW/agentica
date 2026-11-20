@@ -81,8 +81,8 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--line-strong);
-    border-radius: 12px;
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--radius-lg);
     background: var(--surface);
     color: var(--ink);
     box-shadow: var(--shadow-lg);

@@ -215,9 +215,10 @@
   }
   .web-preview__head {
     gap: 2px;
-    padding: 6px 6px 6px 12px;
+    padding: 8px 8px 8px 14px;
     border-bottom: 1px solid var(--line);
-    background: var(--surface-soft);
+    background: var(--surface-header);
+    box-shadow: inset 0 1px 0 var(--surface-edge);
   }
   .web-preview__head .card-action {
     margin-left: 0;
@@ -313,7 +314,7 @@
     flex: 1;
     min-height: 0;
     display: flex;
-    background: color-mix(in srgb, var(--surface) 82%, var(--bg));
+    background: color-mix(in srgb, var(--surface-solid) 82%, var(--bg));
   }
   .web-preview__frame {
     flex: 1;

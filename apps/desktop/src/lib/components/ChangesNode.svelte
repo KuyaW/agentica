@@ -126,7 +126,7 @@
     display: flex;
     flex-direction: column;
     border: 1px solid var(--line-strong);
-    border-radius: 10px;
+    border-radius: var(--radius);
     overflow: hidden;
     background: var(--surface);
     color: var(--ink);
@@ -137,9 +137,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 6px 10px;
+    padding: 9px 12px;
     cursor: grab;
-    border-bottom: 1px solid var(--line-strong);
+    background: var(--surface-header);
+    border-bottom: 1px solid var(--line);
+    box-shadow: inset 0 1px 0 var(--surface-edge);
     flex: none;
   }
   .title {

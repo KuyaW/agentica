@@ -329,8 +329,9 @@
     position: absolute;
     inset: calc(var(--strip) / 2) 0 0 0;
     border: 1px solid var(--line-strong);
-    border-radius: 12px;
+    border-radius: var(--radius);
     background: color-mix(in srgb, var(--surface-soft) 94%, transparent);
+    box-shadow: var(--shadow-inset);
     pointer-events: none;
   }
   .project-drag {
@@ -447,10 +448,10 @@
     min-width: 168px;
     padding: 3px;
     display: grid;
-    border: 1px solid var(--line-strong);
+    border: 1px solid var(--surface-edge);
     border-radius: var(--radius-sm);
     background: var(--surface);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-lg);
   }
   .menu button {
     display: flex;
@@ -505,7 +506,7 @@
   /* Collapsed: a compact bordered strip with the status inline. */
   .collapsed .project-frame {
     inset: 0;
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
   .collapsed .project-drag {
     height: 100%;

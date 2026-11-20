@@ -53,7 +53,13 @@
   import { clock } from "./lib/clock.svelte";
   import { Editor, type DrawingSegment } from "./lib/editor";
   import CanvasExport from "./lib/components/CanvasExport.svelte";
-  import { applyTheme, readTheme, type Theme } from "./lib/theme";
+  import {
+    applyTheme,
+    readAccent,
+    readTheme,
+    type Accent,
+    type Theme,
+  } from "./lib/theme";
   import { readLayout, saveLayout, type Layout } from "./lib/layout";
   import Composer from "./lib/components/Composer.svelte";
   import Reader from "./lib/components/Reader.svelte";
@@ -341,6 +347,7 @@
   // true opens settings without a section (narrow windows show the category list).
   let settingsOpen = $state<boolean | SettingsSection>(false);
   let theme = $state<Theme>(readTheme());
+  let accent = $state<Accent>(readAccent());
   // Chrome only: switching never touches panels, the canvas, or sessions.
   let layout = $state<Layout>(readLayout());
   let recoveryCopy = $state("");
@@ -2297,7 +2304,7 @@
   });
 
   $effect(() => {
-    applyTheme(theme);
+    applyTheme(theme, accent);
   });
 
   $effect(() => {
@@ -3760,7 +3767,7 @@
             }}
             onmove={(_, next) => editor.setViewport(next)}
           >
-            <Background patternColor={dark ? "#2c2c30" : "#d9dbe4"} gap={24} />
+            <Background patternColor={dark ? "#332e4a" : "#d9d2f2"} gap={24} />
             <ViewportSync />
             <ViewportPortal target="back">
               {#each nodeGroupBoxes as box (box.groupId)}
@@ -4198,12 +4205,14 @@
   {#if settingsOpen}
     <Settings
       {theme}
+      {accent}
       {connectionKey}
       {connected}
       workspaceId={editorState.workspace?.workspace.id}
       {sessions}
       section={settingsOpen === true ? undefined : settingsOpen}
       onChange={(next) => (theme = next)}
+      onAccentChange={(next) => (accent = next)}
       {layout}
       onLayoutChange={(next) => {
         layout = next;

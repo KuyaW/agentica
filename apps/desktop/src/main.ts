@@ -1,9 +1,9 @@
 import { mount } from "svelte";
 import "./app.css";
 import App from "./App.svelte";
-import { applyTheme, readTheme } from "./lib/theme";
+import { applyTheme, readAccent, readTheme } from "./lib/theme";
 
-applyTheme(readTheme());
+applyTheme(readTheme(), readAccent());
 
 const target = document.getElementById("app");
 

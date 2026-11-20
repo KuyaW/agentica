@@ -8,6 +8,13 @@ license/NOTICE texts for the shared runtime's resolved dependency graph. Sources
 are unmodified. Keep applicable notices with copies of the compiled backend or
 desktop runtime.
 
+## Desktop UI typefaces
+
+- Source: [Baloo 2](https://fonts.google.com/specimen/Baloo+2) and
+  [Nunito](https://fonts.google.com/specimen/Nunito), via Google Fonts.
+- License: SIL Open Font License 1.1. The `.woff2` files are bundled unmodified
+  in `apps/desktop/public/fonts/` so the app renders offline.
+
 ## Archify diagram viewer
 
 - Source: [Archify](https://github.com/tt-a1i/archify), installed package version

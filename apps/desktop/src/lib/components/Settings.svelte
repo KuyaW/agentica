@@ -5,7 +5,7 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
   import { desktopMode } from "../runtime";
-  import type { Theme } from "../theme";
+  import { ACCENTS, type Accent, type Theme } from "../theme";
   import type { Layout } from "../layout";
   import Icon from "./Icon.svelte";
   import Modal from "./Modal.svelte";
@@ -40,9 +40,12 @@
     /** Agent detection; custom agent changes refresh it. */
     sessions: SessionManager;
     theme: Theme;
+    /** The clay accent palette applied across the UI. */
+    accent: Accent;
     /** Section to open at; without one, narrow windows start at the category list. */
     section?: SettingsSection;
     onChange: (theme: Theme) => void;
+    onAccentChange: (accent: Accent) => void;
     layout: Layout;
     /** Applies the layout now; false when it couldn't be saved for next launch. */
     onLayoutChange: (layout: Layout) => boolean;
@@ -51,8 +54,10 @@
 
   let {
     theme,
+    accent,
     section,
     onChange,
+    onAccentChange,
     layout,
     onLayoutChange,
     onClose,
@@ -490,6 +495,39 @@
           </button>
         </section>
         <section class="setting setting--stacked">
+          <span class="setting__icon"><Icon name="palette" size={20} /></span>
+          <div class="setting__text">
+            <h3 id="accent-label">Accent colour</h3>
+            <p>
+              Tints the clay surfaces, canvas and highlights. Remembered on this
+              device.
+            </p>
+            <div
+              class="setting__body setting__choices"
+              role="radiogroup"
+              aria-labelledby="accent-label"
+            >
+              {#each ACCENTS as option (option.id)}
+                <label class="setting__choice setting__choice--accent">
+                  <input
+                    type="radio"
+                    name="accent"
+                    value={option.id}
+                    checked={accent === option.id}
+                    onchange={() => onAccentChange(option.id)}
+                  />
+                  <span
+                    class="accent-swatch"
+                    style={`background: ${option.swatch}`}
+                    aria-hidden="true"
+                  ></span>
+                  <span><strong>{option.label}</strong></span>
+                </label>
+              {/each}
+            </div>
+          </div>
+        </section>
+        <section class="setting setting--stacked">
           <span class="setting__icon"><Icon name="dashboard" size={20} /></span>
           <div class="setting__text">
             <h3 id="layout-label">Layout</h3>
@@ -721,8 +759,13 @@
 
   .settings__tab--active {
     color: var(--accent-strong);
-    background: var(--accent-soft);
-    font-weight: 600;
+    background: linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--accent-soft) 45%, var(--surface-solid)) 0%,
+      var(--accent-soft) 100%
+    );
+    box-shadow: var(--shadow-sm);
+    font-weight: 700;
   }
 
   .settings__chevron {
@@ -782,6 +825,7 @@
     border-radius: var(--radius);
     border: 1px solid var(--line);
     background: var(--accent-soft);
+    box-shadow: var(--shadow-inset);
     color: var(--ink);
     font-size: 0.88rem;
   }
@@ -885,6 +929,24 @@
     margin-top: 0.15rem;
     font-weight: 400;
     overflow-wrap: anywhere;
+  }
+
+  .setting__choice--accent {
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  /* A tiny clay button in the palette it applies. */
+  .accent-swatch {
+    width: 1.4rem;
+    height: 1.4rem;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      0 4px 10px -4px rgba(60, 44, 130, 0.55),
+      inset 0 -3px 5px rgba(60, 40, 140, 0.22),
+      inset 0 3px 5px rgba(255, 255, 255, 0.5);
   }
 
   .setting__checkbox input {

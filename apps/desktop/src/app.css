@@ -1,62 +1,107 @@
 @import "tailwindcss";
-@import "@fontsource/poppins/latin-400.css";
-@import "@fontsource/poppins/latin-500.css";
-@import "@fontsource/poppins/latin-600.css";
-@import "@fontsource/poppins/latin-700.css";
 @import "@fontsource/material-icons/latin.css";
 
+/* Self-hosted display and UI typefaces (SIL Open Font License). */
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/baloo-2.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/fonts/nunito.woff2") format("woff2");
+}
+
+/* Claymorphism: puffy, light-top-lit surfaces. Every surface is a token, so
+   the dark clay theme swaps in without touching layout rules. --surface is a
+   gradient, so places that need a flat colour for color-mix use
+   --surface-solid instead. */
 :root {
-  --bg: #eef0fa;
-  --bg-accent: #e3e7fb;
-  --surface: #ffffff;
-  --surface-soft: #f7f8fe;
-  --ink: #14162e;
-  --ink-soft: #44476a;
-  --muted: #62668a;
-  --line: #e4e6f4;
-  --line-strong: #d2d5ea;
-  --accent: #7b7bf0;
-  --accent-strong: #9a9aff;
-  --accent-soft: rgba(123, 123, 240, 0.15);
-  --ok: #10996f;
-  --ok-soft: #e5f7f0;
-  --warn: #b26a00;
-  --warn-soft: #fdf3e3;
-  --bad: #d33f4d;
-  --bad-soft: #fdecee;
-  --ok-line: #cdece0;
-  --warn-line: #f3e0c2;
-  --bad-line: #f6d3d7;
-  --glow-1: #ffffff;
-  --glow-2: #e3e7fb;
-  --surface-glass: rgba(255, 255, 255, 0.86);
-  --surface-edge: rgba(255, 255, 255, 0.6);
-  --scrim: rgba(20, 22, 48, 0.42);
-  --radius-lg: 22px;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow-lg: 0 30px 70px -25px rgba(24, 26, 72, 0.35);
+  --bg: #eceafb;
+  --bg-accent: #e6edfc;
+  --surface: linear-gradient(160deg, #fdfdff 0%, #f0eefc 100%);
+  --surface-solid: #f6f4ff;
+  --surface-soft: #f3f0ff;
+  /* Raised tile headers and recessed wells (termimals, diff panes). */
+  --surface-header: linear-gradient(
+    165deg,
+    #ffffff 0%,
+    color-mix(in oklab, var(--accent) 8%, #f2efff) 100%
+  );
+  --surface-well: linear-gradient(160deg, #efeafd 0%, #f8f6ff 100%);
+  --ink: #3f3763;
+  --ink-soft: #625a8a;
+  --muted: #8b85ad;
+  --line: rgba(124, 108, 196, 0.16);
+  --line-strong: rgba(124, 108, 196, 0.28);
+  --accent: #8a78f6;
+  --accent-strong: #6c58ea;
+  --accent-soft: rgba(138, 120, 246, 0.16);
+  --ok: #2f9d7c;
+  --ok-soft: #e2f8ef;
+  --warn: #b9762a;
+  --warn-soft: #fdf1df;
+  --bad: #d0526b;
+  --bad-soft: #fdeaf0;
+  --ok-line: #bfe9d9;
+  --warn-line: #f0dcbb;
+  --bad-line: #f5cfd9;
+  --glow-1: #fdfbff;
+  --glow-2: #e6edfc;
+  --blob-1: #cbbcff;
+  --blob-2: #a9e6d8;
+  --blob-3: #ffd9bd;
+  --surface-glass: rgba(252, 251, 255, 0.78);
+  --surface-edge: rgba(255, 255, 255, 0.72);
+  --scrim: rgba(54, 43, 96, 0.34);
+  --radius-lg: 32px;
+  --radius: 22px;
+  --radius-sm: 16px;
+  --shadow-lg:
+    0 30px 56px -22px rgba(74, 56, 150, 0.48),
+    0 12px 24px -12px rgba(74, 56, 150, 0.3),
+    inset 0 -6px 14px rgba(138, 120, 220, 0.18),
+    inset 0 6px 14px rgba(255, 255, 255, 0.96);
   --shadow-sm:
-    0 1px 2px rgba(24, 26, 72, 0.05), 0 6px 18px -12px rgba(24, 26, 72, 0.28);
+    0 10px 20px -12px rgba(84, 65, 168, 0.4),
+    0 3px 8px -4px rgba(84, 65, 168, 0.2),
+    inset 0 -4px 8px rgba(138, 120, 220, 0.15),
+    inset 0 4px 8px rgba(255, 255, 255, 0.9);
+  --shadow-press:
+    0 4px 10px -6px rgba(84, 65, 168, 0.35),
+    inset 0 5px 12px rgba(126, 106, 208, 0.3),
+    inset 0 -4px 10px rgba(255, 255, 255, 0.7);
+  --shadow-inset:
+    inset 0 3px 8px rgba(120, 105, 190, 0.2),
+    inset 0 -3px 8px rgba(255, 255, 255, 0.9);
+  --font-ui: "Nunito", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Baloo 2", "Nunito", "Segoe UI", system-ui, sans-serif;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   /* Canvas content hierarchy: metadata 12px, body 14px, titles 16px. */
   --type-meta: 12px;
   --type-body: 14px;
   --type-title: 16px;
-  --card-prompt: #f3f4fa;
-  --card-prompt-bar: #6d7194;
-  --card-reply: #ffffff;
-  --card-reply-bar: #5b5bd6;
-  --card-note: #fff6d5;
-  --card-note-line: #d9bd5a;
-  --card-line: #cfd2e6;
-  --selection: #5b5bd6;
-  --focus: #1d4ed8;
+  --card-prompt: #f1edff;
+  --card-prompt-bar: #7b6ba8;
+  --card-reply: linear-gradient(160deg, #ffffff 0%, #f6f3ff 100%);
+  --card-reply-bar: #6c58ea;
+  --card-note: #fff4d3;
+  --card-note-line: #e2c374;
+  --card-line: rgba(124, 108, 196, 0.24);
+  --selection: #6c58ea;
+  --focus: #5b46d6;
   --proposal: #8a4b00;
   --proposal-line: #c77700;
   /* Control text meets 4.5:1 on its own background in each theme. */
-  --accent-ink: #4343b8;
-  --primary-from: #5b5bd6;
-  --primary-to: #4a4ac4;
+  --accent-ink: #5a46c9;
+  --primary-from: #7360e8;
+  --primary-to: #5643c9;
   --on-primary: #ffffff;
   /* Named text style colors; each meets 4.5:1 on the canvas in its theme. */
   --text-red: #c62828;
@@ -66,56 +111,79 @@
   --text-violet: #6d28d9;
   --text-grey: #5f6377;
   color-scheme: light;
-  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-synthesis: none;
   color: var(--ink);
 }
 
 :root[data-theme="dark"] {
-  --bg: #171717; /* Canvas Background[cite: 1] */
-  --bg-accent: #1e1e1e; /* Sidebar Background[cite: 1] */
-  --glow-1: #222225;
-  --glow-2: #1a1a1a;
-  --surface: #262629; /* Node / Element Background[cite: 1] */
-  --surface-soft: #1e1e1e;
-  --ink: #e5e5e5; /* Primary Text[cite: 1] */
-  --ink-soft: #cccccc;
-  --muted: #8e8e93; /* Muted Text[cite: 1] */
-  --line: #333338;
-  --line-strong: #44444a;
-  --accent: #f59e0b; /* Warm Amber Accent from logo/avatar[cite: 1] */
-  --accent-strong: #d97706;
-  --accent-soft: rgba(245, 158, 11, 0.15);
-  --ok: #34d399;
-  --ok-soft: #10322a;
-  --ok-line: #1f5a49;
+  --bg: #14111f;
+  --bg-accent: #1c1830;
+  --glow-1: #241f3a;
+  --glow-2: #131a26;
+  --blob-1: #4b3b8f;
+  --blob-2: #1f5f52;
+  --blob-3: #7a4a2a;
+  --surface: linear-gradient(160deg, #2b2640 0%, #232032 100%);
+  --surface-solid: #262138;
+  --surface-soft: #221e33;
+  --surface-header: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 60%,
+    transparent 100%
+  );
+  --surface-well: linear-gradient(160deg, #1a1628 0%, #221d33 100%);
+  --ink: #ece9ff;
+  --ink-soft: #b7b0dd;
+  --muted: #837da8;
+  --line: rgba(180, 167, 240, 0.16);
+  --line-strong: rgba(180, 167, 240, 0.28);
+  --accent: #a495ff;
+  --accent-strong: #c3b9ff;
+  --accent-soft: rgba(164, 149, 255, 0.18);
+  --ok: #5ee0b0;
+  --ok-soft: #1c3d33;
+  --ok-line: #2c5c4c;
   --warn: #f0b45e;
   --warn-soft: #3a2c14;
   --warn-line: #5c4520;
   --bad: #f8758a;
   --bad-soft: #3a1a22;
   --bad-line: #6b2b38;
-  --surface-glass: rgba(23, 23, 23, 0.86);
-  --surface-edge: rgba(255, 255, 255, 0.08);
-  --scrim: rgba(5, 6, 15, 0.62);
-  --shadow-lg: 0 30px 70px -25px rgba(0, 0, 0, 0.7);
+  --surface-glass: rgba(30, 26, 46, 0.82);
+  --surface-edge: rgba(255, 255, 255, 0.07);
+  --scrim: rgba(8, 6, 16, 0.62);
+  --shadow-lg:
+    0 30px 56px -22px rgba(0, 0, 0, 0.88),
+    0 12px 24px -12px rgba(0, 0, 0, 0.55),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.45),
+    inset 0 6px 14px rgba(255, 255, 255, 0.06);
   --shadow-sm:
-    0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px -12px rgba(0, 0, 0, 0.6);
-  --card-prompt: #1f1f22;
-  --card-prompt-bar: #9a9aa1;
-  --card-reply: #29292d;
-  --card-reply-bar: #f59e0b;
+    0 10px 20px -12px rgba(0, 0, 0, 0.8), 0 3px 8px -4px rgba(0, 0, 0, 0.45),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 4px 8px rgba(255, 255, 255, 0.06);
+  --shadow-press:
+    0 4px 10px -6px rgba(0, 0, 0, 0.6), inset 0 5px 12px rgba(0, 0, 0, 0.55),
+    inset 0 -4px 10px rgba(255, 255, 255, 0.05);
+  --shadow-inset:
+    inset 0 3px 8px rgba(0, 0, 0, 0.4),
+    inset 0 -3px 8px rgba(255, 255, 255, 0.05);
+  --card-prompt: #2c2642;
+  --card-prompt-bar: #a79cc4;
+  --card-reply: linear-gradient(160deg, #2b2640 0%, #262138 100%);
+  --card-reply-bar: #a495ff;
   --card-note: #352e1a;
   --card-note-line: #7a6526;
-  --card-line: #3d3d43;
-  --selection: #f59e0b;
-  --focus: #7cc4ff;
+  --card-line: rgba(180, 167, 240, 0.22);
+  --selection: #b9aeff;
+  --focus: #b9aeff;
   --proposal: #fbbf24;
   --proposal-line: #f59e0b;
-  --accent-ink: #fbbf24;
-  --primary-from: #f59e0b;
-  --primary-to: #e8900a;
-  --on-primary: #1a1a1a;
+  --accent-ink: #c9c0ff;
+  --primary-from: #7360e8;
+  --primary-to: #5643c9;
+  --on-primary: #ffffff;
   --text-red: #f87171;
   --text-orange: #fb923c;
   --text-green: #4ade80;
@@ -123,6 +191,166 @@
   --text-violet: #a78bfa;
   --text-grey: #a1a1aa;
   color-scheme: dark;
+}
+
+/* ------------------------------------------------------------- accents */
+
+/* An accent repaints the clay, not just the ink: the aurora blobs, panels,
+   wells and hairlines are re-mixed from it, so the window warms or cools with
+   the swatch. Lilac is the base palette and needs no override. The primary
+   stops stay deep enough for white button text at 4.5:1. */
+
+[data-accent="mint"] {
+  --accent: #63d7b2;
+  --accent-strong: #1f7a5e;
+  --accent-soft: rgba(99, 215, 178, 0.2);
+  --accent-ink: #1a6a52;
+  --primary-from: #227a5f;
+  --primary-to: #17614b;
+  --blob-1: #a6efd6;
+  --blob-2: #b3e2ff;
+  --blob-3: #ffe6bd;
+}
+
+[data-accent="peach"] {
+  --accent: #ffb37a;
+  --accent-strong: #a04f10;
+  --accent-soft: rgba(255, 179, 122, 0.22);
+  --accent-ink: #8a4712;
+  --primary-from: #b85c14;
+  --primary-to: #9c4a0c;
+  --blob-1: #ffd3b0;
+  --blob-2: #ffc6d6;
+  --blob-3: #ffe9bd;
+}
+
+[data-accent="sky"] {
+  --accent: #74b9fb;
+  --accent-strong: #2b6cb0;
+  --accent-soft: rgba(116, 185, 251, 0.2);
+  --accent-ink: #1d5b9c;
+  --primary-from: #2b6cb0;
+  --primary-to: #1f5595;
+  --blob-1: #b4dcff;
+  --blob-2: #b8efe2;
+  --blob-3: #ffe0c6;
+}
+
+[data-accent="rose"] {
+  --accent: #f887b5;
+  --accent-strong: #c9356d;
+  --accent-soft: rgba(248, 135, 181, 0.2);
+  --accent-ink: #a52a5c;
+  --primary-from: #c9356d;
+  --primary-to: #a52455;
+  --blob-1: #ffc4da;
+  --blob-2: #ffd8c5;
+  --blob-3: #e3d3ff;
+}
+
+/* Light clay: every surface leans toward the chosen hue over the lilac base. */
+
+[data-accent="mint"],
+[data-accent="peach"],
+[data-accent="sky"],
+[data-accent="rose"] {
+  --bg: color-mix(in oklab, var(--accent) 9%, #eceafb);
+  --bg-accent: color-mix(in oklab, var(--accent) 10%, #e6edfc);
+  --surface: linear-gradient(
+    160deg,
+    #fdfdff 0%,
+    color-mix(in oklab, var(--accent) 10%, #f0eefc) 100%
+  );
+  --surface-solid: color-mix(in oklab, var(--accent) 9%, #f6f4ff);
+  --surface-soft: color-mix(in oklab, var(--accent) 8%, #f3f0ff);
+  --surface-glass: color-mix(
+    in oklab,
+    var(--accent) 8%,
+    rgba(252, 251, 255, 0.78)
+  );
+  --line: color-mix(in oklab, var(--accent) 16%, rgba(124, 108, 196, 0.16));
+  --line-strong: color-mix(
+    in oklab,
+    var(--accent) 20%,
+    rgba(124, 108, 196, 0.28)
+  );
+  --card-prompt: color-mix(in oklab, var(--accent) 12%, #f1edff);
+  --card-reply: linear-gradient(
+    160deg,
+    #ffffff 0%,
+    color-mix(in oklab, var(--accent) 10%, #f6f3ff) 100%
+  );
+  --card-line: color-mix(
+    in oklab,
+    var(--accent) 22%,
+    rgba(124, 108, 196, 0.24)
+  );
+  --glow-1: color-mix(in oklab, var(--accent) 6%, #fdfbff);
+  --glow-2: color-mix(in oklab, var(--accent) 12%, #e6edfc);
+  --focus: var(--accent-strong);
+  --selection: var(--accent-strong);
+}
+
+/* Dark clay keeps the same tinting over the dark bases. */
+
+[data-theme="dark"][data-accent="mint"] {
+  --blob-1: #2f7d68;
+  --blob-2: #1f5f7a;
+  --blob-3: #7a5326;
+}
+
+[data-theme="dark"][data-accent="peach"] {
+  --blob-1: #8a5a33;
+  --blob-2: #7a3d50;
+  --blob-3: #6d5326;
+}
+
+[data-theme="dark"][data-accent="sky"] {
+  --blob-1: #2a5f92;
+  --blob-2: #1f6b5c;
+  --blob-3: #7a4a2a;
+}
+
+[data-theme="dark"][data-accent="rose"] {
+  --blob-1: #7a3352;
+  --blob-2: #7a4633;
+  --blob-3: #4b3b8f;
+}
+
+[data-theme="dark"][data-accent="mint"],
+[data-theme="dark"][data-accent="peach"],
+[data-theme="dark"][data-accent="sky"],
+[data-theme="dark"][data-accent="rose"] {
+  --bg: color-mix(in oklab, var(--accent) 8%, #14111f);
+  --bg-accent: color-mix(in oklab, var(--accent) 8%, #1c1830);
+  --accent-strong: color-mix(in oklab, var(--accent) 72%, #ffffff);
+  --accent-ink: color-mix(in oklab, var(--accent) 50%, #ffffff);
+  --surface: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--accent) 10%, #2b2640) 0%,
+    color-mix(in oklab, var(--accent) 8%, #232032) 100%
+  );
+  --surface-solid: color-mix(in oklab, var(--accent) 9%, #262138);
+  --surface-soft: color-mix(in oklab, var(--accent) 8%, #221e33);
+  --line: color-mix(in oklab, var(--accent) 14%, rgba(180, 167, 240, 0.16));
+  --line-strong: color-mix(
+    in oklab,
+    var(--accent) 18%,
+    rgba(180, 167, 240, 0.28)
+  );
+  --card-prompt: color-mix(in oklab, var(--accent) 12%, #2c2642);
+  --card-reply: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--accent) 10%, #2b2640) 0%,
+    color-mix(in oklab, var(--accent) 8%, #262138) 100%
+  );
+  --card-line: color-mix(
+    in oklab,
+    var(--accent) 20%,
+    rgba(180, 167, 240, 0.22)
+  );
+  --focus: var(--accent);
+  --selection: var(--accent);
 }
 
 html,
@@ -133,13 +361,42 @@ body,
   margin: 0;
 }
 
+/* Pastel aurora backdrop: soft colour blobs behind the clay surfaces. Panels
+   are opaque clay, so this reads through the canvas and the start screen. */
 body {
   background:
+    radial-gradient(
+      46rem 34rem at 8% 2%,
+      color-mix(in srgb, var(--blob-1) 58%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      40rem 32rem at 96% 6%,
+      color-mix(in srgb, var(--blob-2) 42%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      36rem 30rem at 74% 96%,
+      color-mix(in srgb, var(--blob-3) 40%, transparent) 0%,
+      transparent 70%
+    ),
     radial-gradient(1100px 600px at 12% -8%, var(--glow-1) 0%, transparent 55%),
     radial-gradient(900px 620px at 100% 0%, var(--glow-2) 0%, transparent 50%),
     var(--bg);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* The chunky rounded display voice for headings and brand marks. */
+h1,
+h2,
+h3,
+.brand,
+.home__brand,
+.tile__name {
+  font-family: var(--font-display);
+  letter-spacing: 0;
 }
 
 *,
@@ -189,30 +446,33 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
-  padding: 0.55rem 0.95rem;
-  border: 1px solid transparent;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--surface-edge);
   border-radius: var(--radius-sm);
   font: inherit;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.1;
   white-space: nowrap;
   color: var(--ink);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition:
-    transform 0.12s ease,
-    box-shadow 0.16s ease,
+    transform 0.22s var(--spring),
+    box-shadow 0.18s ease,
     background 0.16s ease,
     opacity 0.16s ease;
 }
 
 .btn:hover:not(:disabled) {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.97);
+  box-shadow: var(--shadow-press);
 }
 
 .btn:disabled {
@@ -223,25 +483,46 @@ body {
 
 .btn--primary {
   color: var(--on-primary);
+  border-color: rgba(255, 255, 255, 0.4);
   background: linear-gradient(
-    180deg,
+    165deg,
     var(--primary-from) 0%,
     var(--primary-to) 100%
   );
-  box-shadow: 0 10px 22px -12px
-    color-mix(in srgb, var(--accent) 40%, transparent);
+  text-shadow: 0 1px 1px rgba(50, 34, 120, 0.35);
+  box-shadow:
+    0 16px 28px -16px color-mix(in srgb, var(--accent) 72%, transparent),
+    inset 0 -5px 10px rgba(60, 40, 140, 0.28),
+    inset 0 5px 10px rgba(255, 255, 255, 0.4);
+}
+
+.btn--primary:hover:not(:disabled) {
+  box-shadow:
+    0 22px 34px -18px color-mix(in srgb, var(--accent) 80%, transparent),
+    inset 0 -5px 10px rgba(60, 40, 140, 0.26),
+    inset 0 5px 10px rgba(255, 255, 255, 0.45);
 }
 
 .btn--soft {
   color: var(--accent-ink);
-  background: var(--accent-soft);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-soft) 55%, var(--surface-solid)) 0%,
+    var(--accent-soft) 100%
+  );
   border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--ghost {
   background: transparent;
+  box-shadow: none;
   color: var(--ink-soft);
   border-color: var(--line-strong);
+}
+
+.btn--ghost:hover:not(:disabled) {
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--danger {
@@ -262,22 +543,32 @@ body {
   height: 2.2rem;
   padding: 0;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: 14px;
   color: var(--ink-soft);
   background: transparent;
   cursor: pointer;
   transition:
     background 0.16s ease,
+    box-shadow 0.18s ease,
+    transform 0.22s var(--spring),
     color 0.16s ease;
 }
 
 .icon-btn:hover:not(:disabled) {
   background: var(--surface-soft);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
   color: var(--ink);
+}
+
+.icon-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+  box-shadow: var(--shadow-press);
 }
 
 .icon-btn--active {
   background: var(--accent-soft);
+  box-shadow: var(--shadow-sm);
   color: var(--accent-strong);
 }
 
@@ -312,16 +603,18 @@ input,
 select,
 textarea {
   width: 100%;
-  padding: 0.6rem 0.75rem;
+  padding: 0.6rem 0.8rem;
   font: inherit;
   font-size: 0.875rem;
   color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-inset);
   transition:
     border-color 0.16s ease,
-    box-shadow 0.16s ease;
+    box-shadow 0.16s ease,
+    background 0.16s ease;
 }
 
 input::placeholder,
@@ -334,7 +627,10 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+  background: var(--surface-solid);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent),
+    var(--shadow-inset);
 }
 
 textarea {
@@ -420,6 +716,15 @@ label {
   box-shadow: var(--shadow-lg);
 }
 
+/* A popover reads as clay pulled off the surface. */
+.chat__history,
+.select__list,
+.attention-panel,
+.waiting__panel {
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
 .modal--wide {
   width: min(100%, 62rem);
 }
@@ -461,17 +766,19 @@ label {
 .modal__icon {
   display: grid;
   place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.9rem;
+  height: 2.9rem;
   color: #fff;
-  border-radius: 14px;
+  border-radius: 20px;
   background: linear-gradient(
     150deg,
-    var(--accent) 0%,
+    color-mix(in srgb, var(--accent) 80%, #ffffff) 0%,
     var(--accent-strong) 100%
   );
-  box-shadow: 0 12px 24px -14px
-    color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow:
+    0 14px 26px -14px color-mix(in srgb, var(--accent) 60%, transparent),
+    inset 0 -4px 8px rgba(60, 40, 140, 0.24),
+    inset 0 4px 8px rgba(255, 255, 255, 0.45);
 }
 
 .modal__titles h1 {
@@ -514,13 +821,14 @@ label {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.6rem 0.85rem;
+  padding: 0.7rem 0.95rem;
   margin-bottom: 1.25rem;
   font-size: 0.82rem;
   color: var(--ink-soft);
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--surface-edge);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
 .connbar__dot {
@@ -562,6 +870,7 @@ label {
   background: var(--surface-soft);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-inset);
   min-height: 16rem;
 }
 
@@ -572,11 +881,12 @@ label {
   height: 1.4rem;
   padding: 0 0.45rem;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink-soft);
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--surface-edge);
   border-radius: 999px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* ---------------------------------------------------------- workspace home */
@@ -587,7 +897,7 @@ label {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg);
+  background-color: transparent;
   background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
   background-size: 24px 24px;
 }
@@ -657,11 +967,19 @@ button.home__brand:disabled {
 .home__logo {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 9px;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 14px;
   color: var(--on-primary);
-  background: var(--primary-from);
+  background: linear-gradient(
+    150deg,
+    var(--accent) 0%,
+    var(--accent-strong) 100%
+  );
+  box-shadow:
+    0 10px 18px -10px color-mix(in srgb, var(--accent) 62%, transparent),
+    inset 0 -3px 6px rgba(60, 40, 140, 0.28),
+    inset 0 3px 6px rgba(255, 255, 255, 0.45);
 }
 
 .home__tools {
@@ -800,9 +1118,10 @@ button.home__brand:disabled {
   min-height: 3.5rem;
   padding: 0 1.1rem;
   font-size: 1.05rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  background: var(--surface);
+  background: var(--surface-soft);
+  box-shadow: var(--shadow-inset);
 }
 
 .home__form .btn {
@@ -846,6 +1165,7 @@ button.home__brand:disabled {
   border: 2px dashed var(--line-strong);
   border-radius: var(--radius);
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .home__empty p {
@@ -877,10 +1197,20 @@ button.home__brand:disabled {
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--surface-edge);
   border-radius: var(--radius);
   background: var(--surface);
-  transition: border-color 0.16s ease;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.24s ease,
+    transform 0.24s var(--spring);
+}
+
+/* Puffy lift on hover, squish on press: the clay microinteraction. */
+.tile:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
 }
 
 .tile:has(.tile__open:hover:not(:disabled)) {
@@ -1069,8 +1399,9 @@ button.home__brand:disabled {
   gap: 1rem;
   padding: 0.7rem 1.1rem;
   background: var(--surface-glass);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(18px) saturate(1.2);
   border-bottom: 1px solid var(--line);
+  box-shadow: 0 14px 30px -30px rgba(60, 44, 130, 0.55);
 }
 
 .topbar__lead {
@@ -1105,17 +1436,19 @@ button.home__brand:disabled {
 .brand__mark {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.2rem;
+  height: 2.2rem;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 14px;
   background: linear-gradient(
     150deg,
     var(--accent) 0%,
     var(--accent-strong) 100%
   );
-  box-shadow: 0 10px 20px -12px
-    color-mix(in srgb, var(--accent) 50%, transparent);
+  box-shadow:
+    0 12px 22px -12px color-mix(in srgb, var(--accent) 62%, transparent),
+    inset 0 -4px 8px rgba(60, 40, 140, 0.26),
+    inset 0 4px 8px rgba(255, 255, 255, 0.45);
 }
 
 .crumbs {
@@ -1178,12 +1511,13 @@ button.home__brand:disabled {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.35rem 0.7rem;
+  padding: 0.4rem 0.8rem;
   font-size: 0.78rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 999px;
-  border: 1px solid var(--line);
-  background: var(--surface-soft);
+  border: 1px solid var(--surface-edge);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   color: var(--ink-soft);
   white-space: nowrap;
 }
@@ -1240,7 +1574,7 @@ button.pill:disabled {
   position: relative;
   flex: 1;
   min-width: 0;
-  background: var(--bg);
+  background: transparent;
 }
 
 .canvas__drop {
@@ -1254,7 +1588,7 @@ button.pill:disabled {
   gap: 0.5rem;
   border: 2px dashed var(--accent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-solid) 72%, transparent);
   color: var(--accent);
   font-size: 0.9rem;
   font-weight: 600;
@@ -1282,6 +1616,7 @@ button.pill:disabled {
   padding: 0.5rem 0;
   background: var(--surface);
   border-right: 1px solid var(--line);
+  box-shadow: 8px 0 22px -24px rgba(60, 44, 130, 0.7);
 }
 
 .rail__group {
@@ -1334,7 +1669,7 @@ button.pill:disabled {
   right: 3px;
   width: 9px;
   height: 9px;
-  border: 2px solid var(--surface);
+  border: 2px solid var(--surface-solid);
   border-radius: 50%;
 }
 
@@ -1382,10 +1717,10 @@ button.pill:disabled {
   flex-direction: column;
   gap: 0.45rem;
   width: 100%;
-  padding: 0.6rem 0.9rem 0.85rem;
+  padding: 0.65rem 0.95rem 0.9rem;
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 24px;
+  border: 1px solid var(--surface-edge);
+  border-radius: 28px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -1393,9 +1728,11 @@ button.pill:disabled {
    floating card: flat, a quiet border, and an accent edge while typing. */
 .chat__controls .composer {
   border-color: var(--line);
-  border-radius: 12px;
-  box-shadow: none;
-  transition: border-color 0.16s ease;
+  border-radius: 20px;
+  box-shadow: var(--shadow-inset);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .chat__controls .composer:focus-within {
@@ -1491,12 +1828,12 @@ button.pill:disabled {
   display: flex;
   align-items: center;
   gap: 0.2rem;
-  padding: 0.35rem;
+  padding: 0.4rem;
   background: var(--surface-glass);
-  border: 1px solid var(--line-strong);
-  border-radius: 16px;
+  border: 1px solid var(--surface-edge);
+  border-radius: 24px;
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(18px) saturate(1.2);
 }
 
 .toolbar__card--options {
@@ -1514,7 +1851,7 @@ button.pill:disabled {
   color: var(--ink-soft);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 14px;
   cursor: pointer;
   transition:
     color 0.16s ease,
@@ -1531,6 +1868,7 @@ button.pill:disabled {
   color: var(--accent-strong);
   background: var(--accent-soft);
   border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .toolbar__btn:disabled {
@@ -1654,6 +1992,7 @@ button.pill:disabled {
   overflow: hidden;
   background: var(--surface);
   border-right: 1px solid var(--line);
+  box-shadow: 10px 0 26px -26px rgba(60, 44, 130, 0.75);
 }
 
 .sidebar__divider {
@@ -1780,8 +2119,13 @@ button.pill:disabled {
 }
 
 .drawer__item--active {
-  background: var(--accent-soft);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-soft) 40%, var(--surface-solid)) 0%,
+    var(--accent-soft) 100%
+  );
   border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .drawer__delete {
@@ -1805,7 +2149,8 @@ button.pill:disabled {
   color: var(--ink-soft);
   background: var(--surface-soft);
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-inset);
 }
 
 .drawer__text {
@@ -1871,6 +2216,7 @@ button.pill:disabled {
   min-height: 0;
   background: var(--surface);
   border-left: 1px solid var(--line);
+  box-shadow: -12px 0 30px -28px rgba(60, 44, 130, 0.8);
 }
 
 .chat__grip {
@@ -1975,10 +2321,10 @@ button.pill:disabled {
   right: 0.75rem;
   max-height: 60%;
   overflow-y: auto;
-  padding: 0.35rem;
+  padding: 0.4rem;
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
 }
 
@@ -2039,8 +2385,8 @@ button.pill:disabled {
 }
 
 .chat__msg {
-  padding: 0.6rem 0.75rem;
-  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  border-radius: 18px;
   overflow-wrap: anywhere;
   user-select: text;
 }
@@ -2048,11 +2394,19 @@ button.pill:disabled {
 .chat__msg--you {
   align-self: flex-end;
   max-width: 90%;
-  background: var(--accent-soft);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent-soft) 45%, var(--surface-solid)) 0%,
+    var(--accent-soft) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  box-shadow: var(--shadow-sm);
 }
 
 .chat__msg--agent {
+  background: var(--surface-soft);
   border: 1px solid var(--line);
+  box-shadow: var(--shadow-inset);
 }
 
 .chat__role {
@@ -2165,9 +2519,10 @@ button.pill:disabled {
   align-items: center;
   gap: 0.9rem;
   padding: 1rem 1.1rem;
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
+  background: var(--surface);
+  border: 1px solid var(--surface-edge);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
 .setting__icon {
@@ -2224,6 +2579,7 @@ button.pill:disabled {
   height: 1.5rem;
   border-radius: 999px;
   background: var(--line-strong);
+  box-shadow: var(--shadow-inset);
   transition: background 0.2s ease;
 }
 
@@ -2234,9 +2590,12 @@ button.pill:disabled {
   width: 1.1rem;
   height: 1.1rem;
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s ease;
+  background: linear-gradient(160deg, #ffffff, #efecff);
+  box-shadow:
+    0 2px 5px rgba(60, 44, 130, 0.28),
+    inset 0 -2px 3px rgba(140, 120, 215, 0.2),
+    inset 0 2px 3px rgba(255, 255, 255, 0.9);
+  transition: transform 0.26s var(--spring);
 }
 
 .switch[aria-checked="true"] .switch__track {
@@ -2367,6 +2726,15 @@ button.pill:disabled {
   background: var(--surface-glass);
 }
 
+/* Connection points match the clay accent instead of the library default. */
+.svelte-flow__handle {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border: 2px solid var(--surface-solid);
+  box-shadow: 0 2px 5px rgba(60, 44, 130, 0.3);
+}
+
 .svelte-flow .svelte-flow__attribution a {
   color: inherit;
 }
@@ -2389,22 +2757,23 @@ button.pill:disabled {
 }
 
 .canvas-text--framed {
-  padding: 10px 12px 10px 14px;
+  padding: 10px 14px 10px 16px;
   --card-bg: var(--card-reply);
   background: var(--card-bg);
   border: 1px solid var(--card-line);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
 
 /* Plain text shows its box (hidden text, wire ends) unless it is a title; no
    head or shadow, so it stays lighter than a card. */
 .canvas-text--outlined {
-  padding: 8px 12px;
+  padding: 8px 14px;
   --card-bg: var(--surface);
   background: var(--card-bg);
   border: 1px solid var(--card-line);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 /* The bar carries role meaning alongside the text label. */
@@ -2448,7 +2817,7 @@ button.pill:disabled {
 }
 
 .drawing.preview {
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  background: color-mix(in srgb, var(--surface-solid) 70%, transparent);
 }
 
 .card-head {
@@ -2518,7 +2887,7 @@ button.pill:disabled {
   color: var(--ink-soft);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -2754,13 +3123,13 @@ button.card-more {
   gap: 4px;
   width: 100%;
   min-height: 28px;
-  padding: 2px 4px 2px 8px;
+  padding: 2px 6px 2px 10px;
   font: inherit;
   text-align: left;
   color: var(--ink);
-  background: var(--surface);
+  background: var(--surface-soft);
   border: 1px solid var(--card-line);
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
 }
 
@@ -2795,29 +3164,29 @@ button.card-more {
 .select__list {
   position: absolute;
   z-index: 20;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
   min-width: 100%;
   max-width: 18rem;
   max-height: 12rem;
   margin: 0;
-  padding: 4px;
+  padding: 6px;
   overflow-y: auto;
   list-style: none;
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
   outline: none;
 }
 
 .select__list li {
-  padding: 5px 8px;
+  padding: 6px 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--ink);
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
 }
 
@@ -3213,12 +3582,12 @@ span.card-more {
 .review-bar {
   display: grid;
   gap: 0.5rem;
-  padding: 0.6rem 0.75rem;
+  padding: 0.7rem 0.85rem;
   font-size: var(--type-body);
   background: var(--surface);
   border: 1px solid var(--proposal-line);
-  border-radius: 14px;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
 }
 
 .review-bar__row {
@@ -3485,7 +3854,7 @@ span.card-more {
   top: 0;
   left: 0;
   border: 1.5px dashed var(--line-strong);
-  border-radius: 14px;
+  border-radius: var(--radius);
   pointer-events: none;
 }
 
@@ -3524,12 +3893,12 @@ span.card-more {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
-  padding: 6px 8px;
+  padding: 7px 10px;
   font-size: var(--type-body);
   background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 10px;
-  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--surface-edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
 }
 
 .selection-bar__count {
