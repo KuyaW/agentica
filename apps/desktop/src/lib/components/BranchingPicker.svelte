@@ -351,20 +351,35 @@
   // The frame of a camera glide in flight, so a new framing or a pan can take
   // over from it.
   let cameraFrame = 0;
+  // A glide held back until a branch has unfolded can still be cancelled.
+  let cameraTimer = 0;
 
   function stopCamera() {
     cancelAnimationFrame(cameraFrame);
+    clearTimeout(cameraTimer);
   }
 
   onDestroy(stopCamera);
 
-  /** Glide the camera to a framing instead of snapping the view there. */
-  function glideTo(next: Transform, duration = 340) {
+  /**
+   * Glide the camera to a framing instead of snapping the view there. `wait`
+   * holds the glide back, so a branch unfolds before the camera follows it.
+   */
+  function glideTo(next: Transform, duration = 340, wait = 0) {
     stopCamera();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       transform = next;
       return;
     }
+    if (wait > 0) {
+      cameraTimer = window.setTimeout(() => glide(next, duration), wait);
+      return;
+    }
+    glide(next, duration);
+  }
+
+  /** Ease the camera from where it stands to the next framing. */
+  function glide(next: Transform, duration: number) {
     const from = { ...transform };
     const started = performance.now();
     const step = (now: number) => {
@@ -424,7 +439,7 @@
     }
 
     const bounds = openId ? branchBounds(openId) : null;
-    if (!bounds) {
+    if (!bounds || !openId) {
       glideTo(fitTransform(layoutBounds(layout), viewport));
       return;
     }
@@ -435,11 +450,27 @@
       untrack(() => transform.k),
       fit.k,
     );
-    glideTo({
-      k,
-      x: mapWidth / 2 - ((bounds.min.x + bounds.max.x) / 2) * k,
-      y: mapHeight / 2 - ((bounds.min.y + bounds.max.y) / 2) * k,
-    });
+
+    // Hold the camera until the branch's last canvas starts unfolding. The
+    // glide then outlasts that card's fold, so the framing settles just after
+    // the cards land instead of racing them into place.
+    const branch = workspaceKey(openId);
+    const lastUnfold = Math.max(
+      0,
+      ...cards
+        .filter((item) => item.node.parentId === branch)
+        .map((item) => unfoldWait(cards, item.node.id)),
+    );
+
+    glideTo(
+      {
+        k,
+        x: mapWidth / 2 - ((bounds.min.x + bounds.max.x) / 2) * k,
+        y: mapHeight / 2 - ((bounds.min.y + bounds.max.y) / 2) * k,
+      },
+      340,
+      lastUnfold,
+    );
   });
 
   function startPan(event: PointerEvent) {
