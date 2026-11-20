@@ -232,9 +232,11 @@
 
   function startPan(event: PointerEvent) {
     if (event.button !== 0) return;
+    // Pressing a control must never start a pan: the capture that follows
+    // would retarget the pointer release and swallow the control's click.
     if (
       (event.target as HTMLElement).closest(
-        ".map__create, .map__tools, .map__back",
+        "button, input, label, a, .map__create, .map__tools, .map__back",
       )
     )
       return;
@@ -529,13 +531,21 @@
             >
               {#if card.info.kind === "root"}
                 <div class="card card--root">
-                  <span class="card__badge"
-                    ><Icon name="workspaces" size={20} /></span
+                  <button
+                    class="card__open"
+                    type="button"
+                    disabled={!open || locked}
+                    title={open ? "Show every workspace" : "Workspaces"}
+                    onclick={onCollapse}
                   >
-                  <span class="card__copy">
-                    <span class="card__name">{card.info.label}</span>
-                    <span class="card__meta">{card.info.meta}</span>
-                  </span>
+                    <span class="card__badge"
+                      ><Icon name="workspaces" size={20} /></span
+                    >
+                    <span class="card__copy">
+                      <span class="card__name">{card.info.label}</span>
+                      <span class="card__meta">{card.info.meta}</span>
+                    </span>
+                  </button>
                 </div>
               {:else if card.info.kind === "workspace"}
                 {@const expanded = open?.id === workspaceId}
@@ -1025,6 +1035,13 @@
     box-shadow:
       0 0 0 2px var(--accent-soft),
       var(--shadow-sm);
+  }
+
+  /* The hub is a control only while a branch is open; when it is not, it
+     stays a label rather than looking like a faded button. */
+  .card--root .card__open:disabled {
+    opacity: 1;
+    cursor: default;
   }
 
   .card__badge {
