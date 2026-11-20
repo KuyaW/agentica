@@ -1129,7 +1129,8 @@
 
   /* The open branch keeps one ripple going, so the map always shows which
      card the canvases below belong to. Two rings offset in time keep it
-     breathing without a gap. */
+     breathing without a gap. The ring grows by the same distance on every
+     side, so the pulse reads vertically as well as horizontally. */
   .card--open::before,
   .card--open::after {
     content: "";
@@ -1148,11 +1149,11 @@
   @keyframes card-ripple {
     from {
       opacity: 0.5;
-      transform: scale(1);
+      inset: -1px;
     }
     to {
       opacity: 0;
-      transform: scale(1.1);
+      inset: -12px;
     }
   }
 
