@@ -723,6 +723,42 @@ label {
   overflow: hidden;
 }
 
+/* The opening card lifts away and the chrome pops in behind it, so the first
+   paint feels assembled rather than snapped into place. */
+[data-boot="enter"] .titlebar {
+  animation: boot-pop 0.5s var(--spring) 0.05s both;
+}
+
+[data-boot="enter"] .topbar {
+  animation: boot-pop 0.55s var(--spring) 0.12s both;
+}
+
+/* Opacity only for the board: a transform here would move measured geometry
+   while the first canvas is still laying out. */
+[data-boot="enter"] .stage {
+  animation: boot-fade 0.45s ease 0.2s both;
+}
+
+@keyframes boot-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes boot-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ------------------------------------------------------------ modal steps */
 
 .scrim {

@@ -117,6 +117,7 @@
   } from "./lib/canvas-agent";
   import Icon from "./lib/components/Icon.svelte";
   import Logomark from "./lib/components/Logomark.svelte";
+  import Splash from "./lib/components/Splash.svelte";
   import TitleBar from "./lib/components/TitleBar.svelte";
   import AccentPicker from "./lib/components/AccentPicker.svelte";
   import Settings, {
@@ -530,6 +531,25 @@
   let strokeColor = $state(DEFAULT_STROKE_COLOR);
   let strokeWidth = $state(DEFAULT_STROKE_WIDTH);
   let alive = true;
+  /** Opening card: logo, then wordmark, then the shell settles in behind it. */
+  let boot = $state<"hold" | "enter" | "ready">("hold");
+  // Long enough to read the mark and the name, short enough to stay polite.
+  const SPLASH_HOLD_MS = 1500;
+  const SPLASH_TOTAL_MS = 2400;
+
+  onMount(() => {
+    // Reduced motion skips the card rather than flashing it at 0.01ms.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      boot = "ready";
+      return;
+    }
+    const lift = setTimeout(() => (boot = "enter"), SPLASH_HOLD_MS);
+    const done = setTimeout(() => (boot = "ready"), SPLASH_TOTAL_MS);
+    return () => {
+      clearTimeout(lift);
+      clearTimeout(done);
+    };
+  });
 
   const stage = $derived(
     !editorState.workspace
@@ -3272,7 +3292,7 @@
   {/if}
 {/snippet}
 
-<div class="shell">
+<div class="shell" data-boot={boot === "ready" ? undefined : boot}>
   {#if desktopMode}
     <TitleBar {accent} onAccentChange={(next) => (accent = next)} />
   {/if}
@@ -4252,5 +4272,8 @@
         if (document.activeElement === document.body) settingsButton?.focus();
       }}
     />
+  {/if}
+  {#if boot !== "ready"}
+    <Splash leaving={boot === "enter"} />
   {/if}
 </div>
