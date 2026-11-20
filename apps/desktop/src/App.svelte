@@ -3397,7 +3397,7 @@
           />
         {/if}
         {#if layout === "classic"}
-          {@render openProjectControl(false)}
+          {@render openProjectControl()}
         {/if}
         <!-- One control: a status at rest, an action only when one can run. -->
         <span class="save-status" role="status" aria-live="polite">
@@ -3536,18 +3536,17 @@
       </div>
     {/if}
 
-    {#snippet openProjectControl(rail: boolean)}
+    {#snippet openProjectControl()}
       <button
-        class={rail ? "icon-btn" : "btn btn--soft"}
+        class="icon-btn"
         type="button"
         disabled={!canEdit || pickingProject}
         title="Open project"
         aria-label="Open project"
         onclick={() => void openProject()}
-        ><Icon name="folder_open" size={rail ? 20 : 18} />{#if !rail}<span
-            class="label">Open project</span
-          >{/if}</button
       >
+        <Icon name="folder_open" size={20} />
+      </button>
     {/snippet}
     {#snippet galleryControl()}
       <button
@@ -3605,7 +3604,7 @@
             <div class="rail__group">
               {@render galleryControl()}
               {@render sidebarToggles()}
-              {@render openProjectControl(true)}
+              {@render openProjectControl()}
               <CanvasExport canvas={editorState.document} rail />
             </div>
           {/if}

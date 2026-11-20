@@ -39,7 +39,7 @@
 
 <div class="canvas-export" class:canvas-export--rail={rail}>
   <button
-    class={rail ? "icon-btn" : "btn btn--soft"}
+    class="icon-btn"
     type="button"
     aria-label="Export Markdown"
     aria-describedby="canvas-export-help"
@@ -48,10 +48,7 @@
     title="Share canvas notes as Markdown. Visual and live content is not included; note text is shared as written."
     onclick={() => void exportMarkdown()}
   >
-    <Icon name="download" size={rail ? 20 : 18} />
-    {#if !rail}
-      <span class="label">{busy ? "Exporting…" : "Export Markdown"}</span>
-    {/if}
+    <Icon name="download" size={20} />
   </button>
   <span id="canvas-export-help" class="sr-only">
     Export full canvas notes as Markdown. Visual and live content is not
