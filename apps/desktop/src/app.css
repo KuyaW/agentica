@@ -1378,6 +1378,93 @@ button.home__brand:disabled {
   border-color: var(--bad-line);
 }
 
+/* -------------------------------------------------------------- title bar */
+
+/* Window decorations are off in tauri.conf.json, so this bar is the chrome.
+   It drags the window; only the controls take pointer events. */
+.titlebar {
+  position: relative;
+  z-index: 35;
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  padding-left: 0.85rem;
+  background: var(--surface-glass);
+  backdrop-filter: blur(18px) saturate(1.2);
+  border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+
+.titlebar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.titlebar__mark {
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: none;
+  filter: drop-shadow(0 4px 8px rgba(74, 56, 150, 0.28));
+}
+
+.titlebar__spacer {
+  flex: 1;
+  align-self: stretch;
+  pointer-events: none;
+}
+
+.titlebar__controls {
+  display: flex;
+  align-self: stretch;
+  margin-left: auto;
+}
+
+.titlebar__control {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--ink-soft);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+.titlebar__control:hover {
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.titlebar__control:active {
+  background: var(--surface);
+}
+
+.titlebar__control--close:hover {
+  color: #ffffff;
+  background: var(--bad);
+}
+
+.titlebar__control--close:active {
+  color: #ffffff;
+  background: color-mix(in srgb, var(--bad) 80%, #000000);
+}
+
+.titlebar__control:focus-visible {
+  outline-offset: -3px;
+}
+
 /* ----------------------------------------------------------------- topbar */
 
 .topbar {

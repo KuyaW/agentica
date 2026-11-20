@@ -118,6 +118,7 @@
   } from "./lib/canvas-agent";
   import Icon from "./lib/components/Icon.svelte";
   import Logomark from "./lib/components/Logomark.svelte";
+  import TitleBar from "./lib/components/TitleBar.svelte";
   import Settings, {
     type SettingsSection,
   } from "./lib/components/Settings.svelte";
@@ -3265,6 +3266,9 @@
 {/snippet}
 
 <div class="shell">
+  {#if desktopMode}
+    <TitleBar />
+  {/if}
   {#if stage === "workspace"}
     <WorkspacePicker
       workspaces={editorState.workspaces}
@@ -3325,10 +3329,12 @@
     {@render connectionControls()}
     <header class="topbar">
       <div class="topbar__lead">
-        <span class="brand">
-          <Logomark class="brand__mark" />
-          Agentica
-        </span>
+        {#if !desktopMode}
+          <span class="brand">
+            <Logomark class="brand__mark" />
+            Agentica
+          </span>
+        {/if}
         <nav class="crumbs" aria-label="Breadcrumb">
           <button
             class="crumb crumb--workspace"
