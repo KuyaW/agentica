@@ -12,6 +12,8 @@ installers and publishes the release. Keep validation evidence in the
 
 ## Unreleased
 
+## 0.3.1 — 2026-11-20
+
 ### Branching workspace and canvas picker (2026-11-20)
 
 - Changed: the separate workspace and canvas pickers are now one branching
