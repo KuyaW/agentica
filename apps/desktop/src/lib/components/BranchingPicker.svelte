@@ -1,6 +1,8 @@
 <script lang="ts">
   import { LIMITS } from "@agentica/protocol";
   import { tick, type Snippet } from "svelte";
+  import { cubicOut } from "svelte/easing";
+  import { fade, fly, scale } from "svelte/transition";
   import Icon from "./Icon.svelte";
   import Logomark from "./Logomark.svelte";
   import {
@@ -77,8 +79,50 @@
     onOpenSettings,
   }: Props = $props();
 
+  // A card swells out of the branch it joins and shrinks back into it on the
+  // way out. The global reduced-motion rule in app.css shortens both.
+  const growIn = () => ({
+    start: 0.9,
+    opacity: 0,
+    duration: 200,
+    easing: cubicOut,
+  });
+  const growOut = () => ({
+    start: 0.9,
+    opacity: 0,
+    duration: 140,
+    easing: cubicOut,
+  });
+
   let name = $state("");
   let title = $state("");
+  // The map stays quiet until Add workspace opens the naming form.
+  let naming = $state(false);
+  let nameInput = $state<HTMLInputElement | null>(null);
+  let addButton = $state<HTMLButtonElement | null>(null);
+
+  async function startNaming() {
+    naming = true;
+    await tick();
+    nameInput?.focus();
+  }
+
+  /** Fold the form away and put focus back on the button that opened it. */
+  async function stopNaming() {
+    naming = false;
+    await tick();
+    addButton?.focus();
+  }
+
+  async function submitWorkspace() {
+    onCreateWorkspace(name.trim());
+    name = "";
+    naming = false;
+    await tick();
+    // Creating disables the Add button, so focus falls back to the map.
+    (addButton?.disabled ? mapHeading : addButton)?.focus();
+  }
+
   // The icon spins in whole turns, so a fast reconnect still shows one.
   let turning = $state(false);
   // A failed reconnect hides the chip mid-turn; don't resume spinning later.
@@ -448,32 +492,51 @@
       ></div>
 
       <div class="map__create">
-        <form
-          class="create"
-          aria-label="Create workspace"
-          onsubmit={(event) => {
-            event.preventDefault();
-            onCreateWorkspace(name.trim());
-          }}
-        >
-          <label class="sr-only" for="workspace-name">Workspace name</label>
-          <input
-            id="workspace-name"
-            bind:value={name}
-            required
-            maxlength={LIMITS.label}
-            placeholder="Workspace name"
-            autocomplete="off"
-          />
-          <button
-            class="btn btn--primary"
-            type="submit"
-            disabled={locked || !name.trim()}
+        {#if naming}
+          <form
+            class="create"
+            aria-label="Create workspace"
+            onsubmit={(event) => {
+              event.preventDefault();
+              void submitWorkspace();
+            }}
           >
-            {#if busy}<span class="spinner"></span>{/if}
-            Create workspace
+            <label class="sr-only" for="workspace-name">Workspace name</label>
+            <input
+              id="workspace-name"
+              bind:this={nameInput}
+              bind:value={name}
+              required
+              maxlength={LIMITS.label}
+              placeholder="Workspace name"
+              autocomplete="off"
+              onkeydown={(event) => {
+                if (event.key !== "Escape") return;
+                event.preventDefault();
+                void stopNaming();
+              }}
+            />
+            <button
+              class="btn btn--primary"
+              type="submit"
+              disabled={locked || !name.trim()}
+            >
+              {#if busy}<span class="spinner"></span>{/if}
+              Create workspace
+            </button>
+          </form>
+        {:else}
+          <button
+            class="btn btn--primary create__add"
+            type="button"
+            bind:this={addButton}
+            disabled={locked}
+            onclick={() => void startNaming()}
+          >
+            <Icon name="add" size={18} />
+            Add workspace
           </button>
-        </form>
+        {/if}
 
         {#if open}
           <form
@@ -519,7 +582,12 @@
         >
           <svg class="map__edges" aria-hidden="true">
             {#each links as link (link.id)}
-              <path class="map__edge" d={link.d} />
+              <path
+                class="map__edge"
+                d={link.d}
+                in:fade={{ duration: 200 }}
+                out:fade={{ duration: 120 }}
+              />
             {/each}
           </svg>
 
@@ -530,7 +598,11 @@
               style:transform={`translate3d(${card.node.pos.x}px, ${card.node.pos.y}px, 0)`}
             >
               {#if card.info.kind === "root"}
-                <div class="card card--root">
+                <div
+                  class="card card--root"
+                  in:scale={growIn()}
+                  out:scale={growOut()}
+                >
                   <button
                     class="card__open"
                     type="button"
@@ -550,7 +622,12 @@
               {:else if card.info.kind === "workspace"}
                 {@const expanded = open?.id === workspaceId}
                 {@const confirmingCard = isConfirming("workspace", workspaceId)}
-                <div class="card" class:card--open={expanded}>
+                <div
+                  class="card"
+                  class:card--open={expanded}
+                  in:scale={growIn()}
+                  out:scale={growOut()}
+                >
                   <button
                     class="card__open"
                     type="button"
@@ -603,6 +680,8 @@
                     class="card__confirm"
                     role="group"
                     aria-label="Confirm delete"
+                    in:fly={{ y: -6, duration: 180, easing: cubicOut }}
+                    out:fly={{ y: -6, duration: 120, easing: cubicOut }}
                   >
                     <span
                       >Delete “{card.info.label}” and everything in it from this
@@ -640,7 +719,7 @@
                   card.node.id.slice("canvas:".length),
                 )}
                 {@const canvasId = card.node.id.slice("canvas:".length)}
-                <div class="card">
+                <div class="card" in:scale={growIn()} out:scale={growOut()}>
                   <button
                     class="card__open"
                     type="button"
@@ -674,6 +753,8 @@
                     class="card__confirm"
                     role="group"
                     aria-label="Confirm delete"
+                    in:fly={{ y: -6, duration: 180, easing: cubicOut }}
+                    out:fly={{ y: -6, duration: 120, easing: cubicOut }}
                   >
                     <span
                       ><strong>Delete “{card.info.label}”?</strong> Its content is
@@ -845,6 +926,8 @@
     position: absolute;
     top: 0;
     left: 0;
+    /* Glide to new places when an unfolding branch pushes cards aside. */
+    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .map__empty {
@@ -976,12 +1059,17 @@
     color: var(--muted);
   }
 
-  .create .btn {
+  .create .btn,
+  .create__add {
     flex: none;
     min-height: 2.25rem;
     padding: 0 0.8rem;
     font-size: 0.8rem;
     border-radius: 11px;
+  }
+
+  .create__add {
+    width: 100%;
   }
 
   .map__note,
