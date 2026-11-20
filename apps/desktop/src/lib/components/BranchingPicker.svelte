@@ -947,18 +947,27 @@
                 </div>
 
                 {#if confirmingCard}
+                  {@const confirmTitleId = `delete-workspace-${workspaceId}-title`}
+                  {@const confirmDetailId = `${confirmTitleId}-detail`}
                   <div
                     class="card__confirm"
                     role="group"
-                    aria-label="Confirm delete"
+                    aria-labelledby={confirmTitleId}
+                    aria-describedby={confirmDetailId}
                     in:fly={{ y: -6, duration: 180, easing: cubicOut }}
                     out:fly={{ y: -6, duration: 120, easing: cubicOut }}
                   >
-                    <span
-                      >Delete “{card.info.label}” and everything in it from this
-                      computer?</span
-                    >
-                    <span class="tile__actions">
+                    <div class="card__confirm-copy">
+                      <strong id={confirmTitleId}
+                        >Delete “{card.info.label}”?</strong
+                      >
+                      <span id={confirmDetailId}
+                        >Its canvases, chats, files, and settings are removed
+                        from this device. Project folders on disk are left
+                        alone. This can’t be undone.</span
+                      >
+                    </div>
+                    <span class="card__confirm-actions">
                       <button
                         class="btn btn--danger"
                         type="button"
@@ -968,7 +977,7 @@
                         onclick={() =>
                           void confirmDelete("workspace", workspaceId)}
                       >
-                        Delete
+                        <Icon name="delete_forever" size={16} />Delete
                       </button>
                       <button
                         class="btn btn--ghost"
@@ -1665,6 +1674,32 @@
     border: 1px solid var(--bad-line);
     border-radius: 16px;
     box-shadow: var(--shadow-lg);
+  }
+
+  /* The question grows past the card, so lift it above any card below. */
+  .map__node:has(.card__confirm) {
+    z-index: 4;
+  }
+
+  .card__confirm-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .card__confirm-copy strong {
+    font-size: 0.78rem;
+    line-height: 1.25;
+  }
+
+  /* The consequence line supports the heading rather than repeating it. */
+  .card__confirm-copy span {
+    color: var(--ink-soft);
+  }
+
+  .card__confirm-actions {
+    display: flex;
+    gap: 0.4rem;
   }
 
   .card__confirm .btn {
