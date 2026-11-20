@@ -3697,6 +3697,7 @@
           aria-hidden="true"
           style={`background-position: ${viewport.x}px ${viewport.y}px`}
         ></div>
+        <div class="canvas__vignette" aria-hidden="true"></div>
         <input
           hidden
           type="file"

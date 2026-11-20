@@ -1704,7 +1704,15 @@ button.pill:disabled {
   position: relative;
   flex: 1;
   min-width: 0;
-  background: transparent;
+  /* The same surface as the workspace map: gradient clay, a defined edge and
+     the recessed shadow, so editing feels like working on the same board. */
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--line-strong) 45%, var(--muted));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-inset);
+  /* Float the board off the rail and chat, the way the picker's map floats on
+     its page, so the rounded edge reads as a panel instead of a notch. */
+  margin: 0.75rem;
 }
 
 /* Screen-space dot grid, as in the reference canvas: spacing stays the same at
@@ -1717,10 +1725,42 @@ button.pill:disabled {
   pointer-events: none;
   background-image: radial-gradient(
     circle,
-    var(--line-strong) 1.2px,
+    var(--line) 1.2px,
     transparent 1.2px
   );
   background-size: 26px 26px;
+  /* Melt the lattice out at every edge, as on the workspace map. */
+  --grid-fade: 64px;
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent,
+      #000 var(--grid-fade),
+      #000 calc(100% - var(--grid-fade)),
+      transparent
+    ),
+    linear-gradient(
+      to bottom,
+      transparent,
+      #000 var(--grid-fade),
+      #000 calc(100% - var(--grid-fade)),
+      transparent
+    );
+  mask-composite: intersect;
+}
+
+/* A soft vignette, matching the picker: it sits over the dots and under the
+   nodes, so the board gains depth without touching the cards. */
+.canvas__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 58%,
+    color-mix(in oklab, #1b1633 10%, transparent) 100%
+  );
 }
 
 .canvas__drop {
