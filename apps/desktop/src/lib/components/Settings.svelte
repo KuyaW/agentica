@@ -302,12 +302,14 @@
         aria-labelledby="settings-ai-title"
         hidden={selected !== "ai"}
       >
-        <h2 id="settings-ai-title" class="settings__title">AI assistant</h2>
-        <p class="settings__intro">
-          The AI assistant answers on the canvas and can suggest edits for you
-          to accept. It can't run commands or open your files; only tools you
-          turn on in Tools can look anything else up.
-        </p>
+        <div class="settings__heading">
+          <h2 id="settings-ai-title" class="settings__title">AI assistant</h2>
+          <p class="settings__intro">
+            The AI assistant answers on the canvas and can suggest edits for you
+            to accept. It can't run commands or open your files; only tools you
+            turn on in Tools can look anything else up.
+          </p>
+        </div>
 
         <div
           class="settings__status"
@@ -455,12 +457,14 @@
         aria-labelledby="settings-tools-title"
         hidden={selected !== "tools"}
       >
-        <h2 id="settings-tools-title" class="settings__title">Tools</h2>
-        <p class="settings__intro">
-          Tools are what the AI assistant can use besides reading the canvas and
-          proposing edits. Tools you add stay off until you turn them on, and
-          only tools that say they just read can be turned on.
-        </p>
+        <div class="settings__heading">
+          <h2 id="settings-tools-title" class="settings__title">Tools</h2>
+          <p class="settings__intro">
+            Tools are what the AI assistant can use besides reading the canvas
+            and proposing edits. Tools you add stay off until you turn them on,
+            and only tools that say they just read can be turned on.
+          </p>
+        </div>
         {#if selected === "tools"}
           <ToolsSettings {connectionKey} {connected} {workspaceId} />
         {/if}
@@ -565,11 +569,13 @@
         aria-labelledby="settings-advanced-title"
         hidden={selected !== "advanced"}
       >
-        <h2 id="settings-advanced-title" class="settings__title">Advanced</h2>
-        <p class="settings__intro">
-          For people running their own AI server or choosing an exact model.
-          Most people don't need to change anything here.
-        </p>
+        <div class="settings__heading">
+          <h2 id="settings-advanced-title" class="settings__title">Advanced</h2>
+          <p class="settings__intro">
+            For people running their own AI server or choosing an exact model.
+            Most people don't need to change anything here.
+          </p>
+        </div>
 
         <section class="setting setting--stacked">
           <span class="setting__icon"><Icon name="dns" size={20} /></span>
@@ -748,7 +754,7 @@
     background: transparent;
     color: var(--ink-soft);
     font: inherit;
-    font-size: 0.92rem;
+    font-size: 1rem;
     text-align: left;
     cursor: pointer;
   }
@@ -775,17 +781,23 @@
   }
 
   .settings__pane {
+    position: relative;
     overflow-y: auto;
     padding: 1.25rem 1.75rem 2rem;
   }
 
+  /* The saved note sits over the pane's top padding instead of reserving a
+     row, so the section starts right below the header. */
   .settings__pane-head {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.75rem;
+    right: 1.75rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-height: 2rem;
     max-width: 44rem;
-    margin-bottom: 0.5rem;
+    margin-inline: auto;
   }
 
   .settings__to-list {
@@ -796,22 +808,30 @@
   .settings__section {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 1rem;
     max-width: 44rem;
+    margin-inline: auto;
   }
 
   .settings__section[hidden] {
     display: none;
   }
 
+  /* Title and intro read as one block, tighter than the cards under them. */
+  .settings__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
   .settings__title {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.45rem;
     font-weight: 600;
   }
 
   .settings__intro {
-    margin: -0.4rem 0 0;
+    margin: 0;
     font-size: 0.85rem;
     line-height: 1.5;
     color: var(--muted);
@@ -1009,6 +1029,11 @@
     }
     .settings__pane {
       padding: 0.75rem 1rem 1.5rem;
+    }
+    /* Narrow windows show the Back button, so the head goes back in flow. */
+    .settings__pane-head {
+      position: static;
+      margin-bottom: 0.75rem;
     }
   }
 </style>

@@ -110,7 +110,9 @@
     transition:fly={{ y: 18, duration: 260, opacity: 0.4 }}
   >
     <header class="modal__head">
-      <span class="modal__icon"><Icon name={icon} size={22} /></span>
+      <span class="modal__icon"
+        ><Icon name={icon} size={fullscreen ? 26 : 22} /></span
+      >
       <div class="modal__titles">
         <h1>{title}</h1>
         {#if subtitle}<p>{subtitle}</p>{/if}
