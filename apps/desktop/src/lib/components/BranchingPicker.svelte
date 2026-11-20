@@ -713,6 +713,8 @@
         style:background-position={`${transform.x}px ${transform.y}px`}
       ></div>
 
+      <div class="map__vignette" aria-hidden="true"></div>
+
       <div class="map__create" class:map__create--slim={!open && !naming}>
         <!-- An open workspace is the job at hand, so its own creation is out of
              the way and only the canvas form stays. -->
@@ -1172,6 +1174,18 @@
         transparent
       );
     mask-composite: intersect;
+  }
+
+  /* A soft vignette pulls the eye inward and gives the flat surface depth. */
+  .map__vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      color-mix(in oklab, #1b1633 10%, transparent) 100%
+    );
   }
 
   .map__world {
