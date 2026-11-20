@@ -707,6 +707,12 @@
         Workspaces and canvases
       </h1>
 
+      <div
+        class="map__grid"
+        aria-hidden="true"
+        style:background-position={`${transform.x}px ${transform.y}px`}
+      ></div>
+
       <div class="map__create" class:map__create--slim={!open && !naming}>
         <!-- An open workspace is the job at hand, so its own creation is out of
              the way and only the canvas form stays. -->
@@ -1102,6 +1108,8 @@
 <style>
   .picker {
     overflow: hidden;
+    /* The canvas keeps its dot grid; the page around it stays plain. */
+    background-image: none;
   }
 
   .stage {
@@ -1131,6 +1139,18 @@
 
   .map--panning {
     cursor: grabbing;
+  }
+
+  .map__grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(
+      circle,
+      var(--line-strong) 1.2px,
+      transparent 1.2px
+    );
+    background-size: 26px 26px;
   }
 
   .map__world {
