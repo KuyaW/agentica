@@ -2,8 +2,18 @@
   import { onMount } from "svelte";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { desktopMode } from "../runtime";
+  import type { Accent } from "../theme";
+  import AccentPicker from "./AccentPicker.svelte";
   import Icon from "./Icon.svelte";
   import Logomark from "./Logomark.svelte";
+
+  interface Props {
+    /** The clay accent palette applied across the UI. */
+    accent: Accent;
+    onAccentChange: (accent: Accent) => void;
+  }
+
+  let { accent, onAccentChange }: Props = $props();
 
   // Only the desktop window has native controls to replace.
   const appWindow = desktopMode ? getCurrentWindow() : undefined;
@@ -49,6 +59,7 @@
     <span>Agentica</span>
   </span>
   <div class="titlebar__spacer"></div>
+  <AccentPicker {accent} onChange={onAccentChange} />
   <div class="titlebar__controls">
     <button
       class="titlebar__control"

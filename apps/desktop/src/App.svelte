@@ -54,7 +54,6 @@
   import { Editor, type DrawingSegment } from "./lib/editor";
   import CanvasExport from "./lib/components/CanvasExport.svelte";
   import {
-    ACCENTS,
     applyTheme,
     readAccent,
     readTheme,
@@ -119,6 +118,7 @@
   import Icon from "./lib/components/Icon.svelte";
   import Logomark from "./lib/components/Logomark.svelte";
   import TitleBar from "./lib/components/TitleBar.svelte";
+  import AccentPicker from "./lib/components/AccentPicker.svelte";
   import Settings, {
     type SettingsSection,
   } from "./lib/components/Settings.svelte";
@@ -3265,7 +3265,7 @@
 
 <div class="shell">
   {#if desktopMode}
-    <TitleBar />
+    <TitleBar {accent} onAccentChange={(next) => (accent = next)} />
   {/if}
   {#if stage === "workspace"}
     <WorkspacePicker
@@ -3332,6 +3332,8 @@
             <Logomark class="brand__mark" />
             Agentica
           </span>
+          <!-- No window app bar in browser mode; the header keeps the palette. -->
+          <AccentPicker {accent} onChange={(next) => (accent = next)} />
         {/if}
         <nav class="crumbs" aria-label="Breadcrumb">
           <button
@@ -3408,19 +3410,6 @@
             >
           {/if}
         </span>
-        <div class="accent-picker" role="group" aria-label="Accent colour">
-          {#each ACCENTS as option (option.id)}
-            <button
-              class="accent-dot"
-              type="button"
-              aria-pressed={accent === option.id}
-              aria-label={`${option.label} accent`}
-              title={`${option.label} accent`}
-              style={`--swatch: ${option.swatch}`}
-              onclick={() => (accent = option.id)}
-            ></button>
-          {/each}
-        </div>
         {#if layout === "classic"}
           <span class="topbar__divider"></span>
           {@render galleryControl()}

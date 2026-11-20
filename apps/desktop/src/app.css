@@ -1485,6 +1485,11 @@ button.home__brand:disabled {
   outline-offset: -3px;
 }
 
+/* The palette switch sits in the app bar, clear of the window controls. */
+.titlebar > .accent-picker {
+  margin-right: 0.4rem;
+}
+
 /* ----------------------------------------------------------------- topbar */
 
 .topbar {
