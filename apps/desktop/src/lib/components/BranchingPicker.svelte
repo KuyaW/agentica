@@ -1154,6 +1154,24 @@
       transparent 1.2px
     );
     background-size: 26px 26px;
+    /* Melt the lattice out at every edge instead of clipping it at the border. */
+    --grid-fade: 64px;
+    mask-image:
+      linear-gradient(
+        to right,
+        transparent,
+        #000 var(--grid-fade),
+        #000 calc(100% - var(--grid-fade)),
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        transparent,
+        #000 var(--grid-fade),
+        #000 calc(100% - var(--grid-fade)),
+        transparent
+      );
+    mask-composite: intersect;
   }
 
   .map__world {
